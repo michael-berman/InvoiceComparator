@@ -11,5 +11,5 @@ class Supplier(models.Model):
 class InvoiceItem(models.Model):
     supplier_id = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     description = models.CharField(max_length=1000)
-    price = models.DecimalField()
+    price = models.DecimalField(max_digits=7, decimal_places=2)
     ship_date = models.DateTimeField()
