@@ -1,1 +1,7 @@
-{{ supplier }}
+<h1>{{ supplier }}</h1>
+
+<ul>
+{% for invoice_item in supplier.invoiceitem_set.all %}
+    <li>{{ invoice_item.description }}</li>
+{% endfor %}
+</ul>
