@@ -1,0 +1,9 @@
+{% if supplier_list %}
+    <ol>
+    {% for supplier in supplier_list %}
+        <li>Name: <a href="/invoiceparser/{{ supplier.id }}"><b>{{ supplier.supplier_name }}</a></b> Location: <b>{{supplier.supplier_location}}</b></li>
+    {% endfor %}
+    </ol>
+{% else %}
+    <p>No suppliers are available.</p>
+{% endif %}
