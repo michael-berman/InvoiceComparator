@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 from django.template import loader
 
@@ -16,10 +16,7 @@ def index(request):
 
 
 def detail(request, supplier_id):
-    try:
-        supplier = Supplier.objects.get(pk=supplier_id)
-    except Supplier.DoesNotExist:
-        raise Http404("Supplier does not exist")
+    supplier = get_object_or_404(Supplier, pk=supplier_id)
 
     context = {
         'supplier': supplier
