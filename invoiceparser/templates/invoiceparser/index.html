@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'invoiceparser/style.css' %}">
+
 {% if supplier_list %}
     <ol>
     {% for supplier in supplier_list %}
