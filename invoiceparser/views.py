@@ -59,6 +59,8 @@ def upload_file(request):
         if request.FILES['invoice']:
             invoice_text = _extract_text(invoice_file)
 
+    os.remove(invoice_file.name)
+
     supplier_list = Supplier.objects.order_by('supplier_name')
     context = {
         'supplier_list': supplier_list,
@@ -70,13 +72,12 @@ def upload_file(request):
 def _extract_text(invoice_file):
     # Open a PDF file.
     # path = '/Users/michaelberman/Documents/unread_invoice.pdf'
-    print(invoice_file.name)
-    new_file = None
+    # with TemporaryFile() as f:
+    # f.write(invoice_file.read())
 
-    with TemporaryFile() as f:
-        f.write(invoice_file.read())
+    ocrmypdf.ocr(invoice_file.file, invoice_file.name, deskew=True)
+    temp_file = open(invoice_file.name, "r")
 
-        ocrmypdf.ocr(invoice_file, invoice_file.name, deskew=True)
-        with pdfplumber.load(invoice_file) as pdf:
-            page = pdf.pages[0]
-            return page.extract_text()
+    with pdfplumber.load(temp_file.buffer) as pdf:
+        page = pdf.pages[0]
+        return page.extract_text()
