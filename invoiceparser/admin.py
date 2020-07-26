@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Supplier, InvoiceItem
+from .models import Supplier, Invoice, InvoiceItem
 
 
 class SupplierAdmin(admin.ModelAdmin):
@@ -32,7 +32,7 @@ class InvoiceItemAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Invoice', {
             "fields": (
-                ['invoice_number']
+                ['invoice']
             ),
         }),
         ('Invoice Item Information', {
@@ -46,4 +46,5 @@ class InvoiceItemAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Supplier, SupplierAdmin)
+admin.site.register(Invoice, InvoiceAdmin)
 admin.site.register(InvoiceItem, InvoiceItemAdmin)
