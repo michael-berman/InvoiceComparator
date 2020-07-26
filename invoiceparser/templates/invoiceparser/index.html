@@ -10,3 +10,12 @@
 {% else %}
     <p>No suppliers are available.</p>
 {% endif %}
+
+
+
+<ul>
+{% for line in extracted_text %}
+    <li>{{ line }}</li>
+{% endfor %}
+</ul>
+{% comment %} <p>{{ extracted_text }}</p> {% endcomment %}

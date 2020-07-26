@@ -8,6 +8,15 @@
 {% endfor %}
 </ul>
 
+<h1>test file</h1>
+<form action="{% url 'invoiceparser:upload' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="invoice">
+    <input type="submit" name="submit" value="Upload">
+</form>
+
+
+<h1> test form </h1>
 <form action="{% url 'invoiceparser:create' supplier.id %}" method="post">
     {% csrf_token %}
     <input type="text" name="description" id="invoice_item_description"><br>
@@ -15,3 +24,4 @@
     <input type="datetime-local" name="ship_date" id="invoice_item_date"><br>
     <input type="submit" value="Create">
 </form>
+
