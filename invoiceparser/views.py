@@ -52,7 +52,7 @@ def upload_file(request):
     if request.method == 'POST':
         invoice_file = request.FILES['invoice']
         if request.FILES['invoice']:
-            invoice_text = save_line_items(invoice_file)
+            meta_data = save_line_items(invoice_file)
 
     supplier_list = Supplier.objects.order_by('supplier_name')
     context = {
