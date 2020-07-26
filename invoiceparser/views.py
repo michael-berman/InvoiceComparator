@@ -2,15 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-import os
-import io
-import ocrmypdf
-import pdfplumber
-import pandas as pd
-from tempfile import TemporaryFile
 
 
 from .models import Supplier, InvoiceItem
+from .services import save_line_items
 
 
 def index(request):
@@ -57,27 +52,11 @@ def upload_file(request):
     if request.method == 'POST':
         invoice_file = request.FILES['invoice']
         if request.FILES['invoice']:
-            invoice_text = _extract_text(invoice_file)
-
-    os.remove(invoice_file.name)
+            invoice_text = save_line_items(invoice_file)
 
     supplier_list = Supplier.objects.order_by('supplier_name')
     context = {
         'supplier_list': supplier_list,
-        'extracted_text': invoice_text
+        'extracted_text': meta_data
     }
     return render(request, 'invoiceparser/index.html', context)
-
-
-def _extract_text(invoice_file):
-    # Open a PDF file.
-    # path = '/Users/michaelberman/Documents/unread_invoice.pdf'
-    # with TemporaryFile() as f:
-    # f.write(invoice_file.read())
-
-    ocrmypdf.ocr(invoice_file.file, invoice_file.name, deskew=True)
-    temp_file = open(invoice_file.name, "r")
-
-    with pdfplumber.load(temp_file.buffer) as pdf:
-        page = pdf.pages[0]
-        return page.extract_text()
