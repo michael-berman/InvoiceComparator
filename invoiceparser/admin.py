@@ -11,20 +11,37 @@ class SupplierAdmin(admin.ModelAdmin):
     search_fields = ['supplier_name']
 
 
-class InvoiceItemAdmin(admin.ModelAdmin):
+class InvoiceAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Supplier', {
             "fields": (
                 ['supplier']
             ),
         }),
-        ('Invoice Item Information', {
+        ('Invoice Information', {
             'fields': (
-                ['description', 'price', 'ship_date']
+                ['invoice_number', 'invoice_date']
             )})
     ]
-    list_display = ('description', 'supplier', 'price', 'ship_date')
-    list_filter = ['ship_date', 'price', 'supplier']
+    list_display = ('invoice_number', 'invoice_date')
+    list_filter = ['invoice_number', 'invoice_date']
+    search_fields = ['invoice_number']
+
+
+class InvoiceItemAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Invoice', {
+            "fields": (
+                ['invoice_number']
+            ),
+        }),
+        ('Invoice Item Information', {
+            'fields': (
+                ['description', 'price']
+            )})
+    ]
+    list_display = ('description', 'invoice', 'price')
+    list_filter = ['price', 'invoice']
     search_fields = ['description']
 
 

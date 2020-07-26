@@ -11,11 +11,16 @@ class Supplier(models.Model):
         return self.supplier_name
 
 
-class InvoiceItem(models.Model):
+class Invoice(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    invoice_number = models.CharField(max_length=20)
+    invoice_date = models.DateField()
+
+
+class InvoiceItem(models.Model):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     description = models.CharField(max_length=1000)
     price = models.DecimalField(max_digits=7, decimal_places=2)
-    ship_date = models.DateTimeField()
 
     def __str__(self):
         return self.description
