@@ -16,6 +16,9 @@ class Invoice(models.Model):
     invoice_number = models.CharField(max_length=20)
     invoice_date = models.DateField()
 
+    def __str__(self):
+        return self.invoice_number
+
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
