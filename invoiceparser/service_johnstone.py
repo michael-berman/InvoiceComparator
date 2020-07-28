@@ -5,8 +5,9 @@ def parse_johnstone_invoice(invoice_text):
     # Regular expressions for parsing
     date_re = re.compile(r'([0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9])')
     description_re = re.compile(r'(?i)(Description)')
-    each_re = re.compile(r'\d+ea \d+ea')
-    first_half_line_item_re = re.compile(r'(?i)(\d+ea \d+ea(.*))')
+    each_re = re.compile(r'(?i)(^.+ea  \d+ea(.*))')
+    first_half_line_item_re = re.compile(r'(?i)(.+ea  \d+ea(.*))')
+    first_half_2_line_item_re = re.compile(r'(?i)(\d+ea  \d+eaj](.*))')
     second_half_line_item_re = re.compile(r'(?i)(?:(?! \d+.\d+\/ea).)*')
     price_raw_re = re.compile(r'(?i)\d+.\d+\/ea')
     price_re_without_ea = re.compile(r'(?i)(?:(?!\/ea).)*')
@@ -42,10 +43,21 @@ def parse_johnstone_invoice(invoice_text):
                     break
 
                 if each_re.search(description_line):
-                    current_item = re.search(
-                        first_half_line_item_re, description_line).group(2)
-                    current_item = re.search(
-                        second_half_line_item_re, current_item).group(0)
+                    # for one liners
+                    # if current_item and current_price:
+                    #     line_items.append((current_item, current_price))
+
+                    # check first with eaj
+                    if first_half_line_item_re.search(description_line):
+                        current_item = first_half_line_item_re.search(
+                            description_line).group(2)
+                        current_item = second_half_line_item_re.search(
+                            current_item).group(0).strip()
+                    elif first_half_2_line_item_re.search(description_line):
+                        current_item = first_half_line_item_re.search(
+                            description_line).group(2)
+                        current_item = second_half_line_item_re.search(
+                            current_item).group(0).strip()
 
                     if price_raw_re.search(description_line):
                         current_price = re.search(
