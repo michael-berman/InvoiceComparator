@@ -11,6 +11,7 @@ import pdfplumber
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
 from .service_carrier import parse_carrier_invoice
+from .service_capco import parse_capco_invoice
 
 
 def save_line_items(invoice_file):
@@ -22,6 +23,7 @@ def save_line_items(invoice_file):
     delta_re = re.compile(r'(?i)DELTA')
     johnstone_re = re.compile(r'(?i)(JOHNSTONE)')
     carrier_re = re.compile(r'(?i)(Distributor Corporation of New England)')
+    capco_re = re.compile(r'(?i)(capco)')
 
     lines = invoice_text.split("\n")
     for i in range(len(lines)):
@@ -35,6 +37,9 @@ def save_line_items(invoice_file):
 
         if carrier_re.match(line):
             return parse_carrier_invoice(invoice_text)
+
+        if capco_re.match(line):
+            return parse_capco_invoice(invoice_text)
 
 
 def convert_with_ocr(invoice_file):
