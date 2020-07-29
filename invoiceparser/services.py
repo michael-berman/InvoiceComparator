@@ -10,6 +10,7 @@ import pdfplumber
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
+from .service_carrier import parse_carrier_invoice
 
 
 def save_line_items(invoice_file):
@@ -18,8 +19,9 @@ def save_line_items(invoice_file):
         os.remove(invoice_file.name)
 
     # Regular expressions
-    delta_re = re.compile(r'(?i)^DELTA')
+    delta_re = re.compile(r'(?i)DELTA')
     johnstone_re = re.compile(r'(?i)(JOHNSTONE)')
+    carrier_re = re.compile(r'(?i)(Distributor Corporation of New England)')
 
     lines = invoice_text.split("\n")
     for i in range(len(lines)):
@@ -31,11 +33,15 @@ def save_line_items(invoice_file):
         if johnstone_re.match(line):
             return parse_johnstone_invoice(invoice_text)
 
+        if carrier_re.match(line):
+            return parse_carrier_invoice(invoice_text)
+
 
 def convert_with_ocr(invoice_file):
 
     try:
-        ocrmypdf.ocr(invoice_file.file, invoice_file.name, deskew=True)
+        ocrmypdf.ocr(invoice_file.file, invoice_file.name,
+                     deskew=True, force_ocr=True)
         temp_file = open(invoice_file.name, "r")
 
         with pdfplumber.load(temp_file.buffer) as pdf:
