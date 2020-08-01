@@ -11,11 +11,33 @@
     <p>No suppliers are available.</p>
 {% endif %}
 
+<h2>Upload:</h2>
+<form action="{% url 'invoiceparser:upload' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="invoice">
+    <input type="submit" name="submit" value="Upload">
+</form>
 
-
-<ul>
-{% for line in extracted_text %}
-    <li>{{ line }}</li>
-{% endfor %}
-</ul>
-{% comment %} <p>{{ extracted_text }}</p> {% endcomment %}
+{% comment %} {% if extracted_text %} {% endcomment %}
+<h3>Invoice</h3>
+<form action="{% url 'invoiceparser:create' 1 %}" method="post">
+    {% csrf_token %} 
+    <h5>Invoice Information</h5>
+    <div class="invoice-container info-container">
+        <label for="Invoice Date">Invoice Date</label>
+        <input type="text" name="Invoice Date" value="{{ extracted_text.invoice_date }}"><br>
+        <label for="Invoice Date">Invoice Number</label>
+        <input type="text" name="Invoice Number" value="{{ extracted_text.invoice_number }}"><br>
+    </div>
+    <h5>Invoice Items</h5>
+    {% for item, price in extracted_text.line_items %}
+        <div class="invoice-container item-container">
+            <label for="{{ item }}" >Invoice Item</label>
+            <input type="text" name="{{ item }}"  value="{{ item }}" class="form-input"><br>
+            <label for="{{ price }}" >Item Price</label>
+            <input type="text" name="{{ price }}" value="{{ price }}"><br>
+        </div>
+    {% endfor %}
+    <input type="submit" value="Save">
+</form>
+{% comment %} {% endif %} {% endcomment %}

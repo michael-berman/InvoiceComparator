@@ -11,7 +11,8 @@ from .services import save_line_items
 def index(request):
     supplier_list = Supplier.objects.order_by('supplier_name')
     context = {
-        'supplier_list': supplier_list
+        'supplier_list': supplier_list,
+        'extracted_text': {}
     }
     return render(request, 'invoiceparser/index.html', context)
 

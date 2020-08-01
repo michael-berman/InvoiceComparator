@@ -12,9 +12,9 @@ def parse_capco_invoice(invoice_text):
     line_item_re = re.compile(r'((?:(?!(\d+  \d{1,4}\.\d{3})).)*)')
     final_line_re = re.compile(r'(?i)(note)')
 
-    meta_data = []
+    meta_data = {}
     line_items = []
-    ship_date = ""
+    invoice_date = ""
     invoice_number = ""
 
     invoice_date_found = False
@@ -24,11 +24,10 @@ def parse_capco_invoice(invoice_text):
         line = lines[i]
 
         if date_re.match(line) and invoice_date_found is False:
-            ship_date = date_re.search(line).group(0)
+            invoice_date = date_re.search(line).group(0)
 
             # OCR is reading S as $
             invoice_number = invoice_number.replace("$", "S")
-            meta_data.append("Invoice Date: " + ship_date)
             invoice_date_found = True
 
         if invoice_number_re.search(line) and invoice_number_found is False:
@@ -36,7 +35,6 @@ def parse_capco_invoice(invoice_text):
 
             # OCR is reading S as $
             invoice_number = invoice_number.replace("$", "S")
-            meta_data.append("Invoice Number: " + invoice_number)
             invoice_number_found = True
 
         if price_re.search(line):
@@ -69,7 +67,7 @@ def parse_capco_invoice(invoice_text):
 
             break
 
-    for line_item in line_items:
-        item, price = line_item
-        meta_data.append(item + " : " + price)
+    meta_data["invoice_date"] = invoice_date
+    meta_data["invoice_number"] = invoice_number
+    meta_data["line_items"] = line_items
     return meta_data

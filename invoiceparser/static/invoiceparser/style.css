@@ -1,3 +1,21 @@
 li a {
     color: green;
 }
+
+.form-input {
+    width: 500px;
+}
+
+.invoice-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-container {
+    width: 50%;
+}
+
+.item-container {
+    width: 60%;
+    margin-top: 10px;
+}

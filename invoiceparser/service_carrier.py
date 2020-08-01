@@ -14,7 +14,7 @@ def parse_carrier_invoice(invoice_text):
     # line_item_re = re.compile(r'(\b\d \s+\K\S+)')
     final_line_re = re.compile(r'(?i)(Lines)')
 
-    meta_data = []
+    meta_data = {}
     line_items = []
     invoice_date = ""
     invoice_number = ""
@@ -28,12 +28,10 @@ def parse_carrier_invoice(invoice_text):
         if date_re.search(line) and invoice_date_found is False:
             invoice_date = date_re.search(line).group(0)
 
-            meta_data.append("Invoice Date: " + invoice_date)
             invoice_date_found = True
 
         if invoice_number_re.search(line) and invoice_number_found is False:
             invoice_number = invoice_number_re.search(line).group(0)
-            meta_data.append("Invoice_number: " + invoice_number)
             invoice_number_found = True
 
         if each_re.search(line):
@@ -72,7 +70,7 @@ def parse_carrier_invoice(invoice_text):
                     # meta_data.append("Description: " + current_item)
             break
 
-    for line_item in line_items:
-        item, price = line_item
-        meta_data.append(item + " : " + price)
+    meta_data["invoice_date"] = invoice_date
+    meta_data["invoice_number"] = invoice_number
+    meta_data["line_items"] = line_items
     return meta_data

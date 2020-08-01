@@ -13,9 +13,9 @@ def parse_johnstone_invoice(invoice_text):
     price_re_without_ea = re.compile(r'(?i)(?:(?!\/ea).)*')
     subtotal_re = re.compile(r'(?i)(Subtotal)')
 
-    meta_data = []
+    meta_data = {}
     line_items = []
-    ship_date = ""
+    invoice_date = ""
     invoice_number = ""
 
     invoice_date_found = False
@@ -23,11 +23,7 @@ def parse_johnstone_invoice(invoice_text):
     for i in range(len(lines)):
         line = lines[i]
         if date_re.match(line) and invoice_date_found is False:
-            date, invoice_number = line.split(" ")
-
-            # OCR is reading S as $
-            meta_data.append("Invoice Date: " + date)
-            meta_data.append("Invoice Number: " + invoice_number)
+            invoice_date, invoice_number = line.split(" ")
             invoice_date_found = True
 
         if description_re.search(line):
@@ -71,7 +67,7 @@ def parse_johnstone_invoice(invoice_text):
 
             break
 
-    for line_item in line_items:
-        item, price = line_item
-        meta_data.append(item + " : " + price)
+    meta_data["invoice_date"] = invoice_date
+    meta_data["invoice_number"] = invoice_number
+    meta_data["line_items"] = line_items
     return meta_data
