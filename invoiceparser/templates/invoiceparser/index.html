@@ -1,10 +1,12 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'invoiceparser/style.css' %}">
 
+<h2>Suppliers</h2>
 {% if supplier_list %}
     <ol>
     {% for supplier in supplier_list %}
-        <li>Name: <a href="{% url 'invoiceparser:detail' supplier.id %}"><b>{{ supplier.supplier_name }}</a></b> Location: <b>{{supplier.supplier_location}}</b></li>
+        <li><a href="{% url 'invoiceparser:detail' supplier.id %}"><b>{{ supplier.supplier_name }}</a></b>
+        <b>{{supplier.supplier_location}}</b></li>
     {% endfor %}
     </ol>
 {% else %}
@@ -15,7 +17,7 @@
 <form action="{% url 'invoiceparser:upload' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="file" name="invoice">
-    <input type="submit" name="submit" value="Upload">
+    <input type="submit" name="submit" value="Parse" class="button">
 </form>
 
 {% comment %} {% if extracted_text %} {% endcomment %}
@@ -38,6 +40,6 @@
             <input type="text" name="{{ price }}" value="{{ price }}"><br>
         </div>
     {% endfor %}
-    <input type="submit" value="Save">
+    <input type="submit" value="Save" class="button">
 </form>
 {% comment %} {% endif %} {% endcomment %}
