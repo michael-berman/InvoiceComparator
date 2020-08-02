@@ -5,8 +5,8 @@ def parse_delta_invoice(invoice_text):
     # Regular expressions for parsing
     date_re = re.compile(r'([0-9][0-9]/[0-9][0-9]/[0-9][0-9])')
     description_re = re.compile(r'^ DESCRIPTION')
-    each_re = re.compile(r'\dEA')
-    price_re = re.compile(r'(?i)([0-9]{1,3}\.[0-9][0-9][0-9]ea)')
+    each_re = re.compile(r'(?i)(\d+EA)')
+    price_re = re.compile(r'(?i)([0-9]{1,3}\.[0-9][0-9][0-9])')
     line_item_re = re.compile(r'(?:(?!\dEA).)*')
     final_line_re = re.compile(r'(?i)(Thank)')
 
