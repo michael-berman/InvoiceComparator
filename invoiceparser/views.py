@@ -9,7 +9,7 @@ from .services import save_line_items
 
 
 def index(request):
-    supplier_list = Supplier.objects.order_by('supplier_name')
+    supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': supplier_list,
         'extracted_text': {}
@@ -55,7 +55,7 @@ def upload_file(request):
         if request.FILES['invoice']:
             meta_data = save_line_items(invoice_file)
 
-    supplier_list = Supplier.objects.order_by('supplier_name')
+    supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': supplier_list,
         'extracted_text': meta_data
