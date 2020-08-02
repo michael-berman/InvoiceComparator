@@ -4,6 +4,7 @@ import re
 def parse_johnstone_invoice(invoice_text):
     # Regular expressions for parsing
     date_re = re.compile(r'([0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9])')
+    invoice_number_re = re.compile(r'(\d+\-.+)')
     description_re = re.compile(r'(?i)(Description)')
     each_re = re.compile(r'(?i)(^.+ea  \d+ea(.*))')
     first_half_line_item_re = re.compile(r'(?i)(.+ea  \d+ea(.*))')
@@ -22,8 +23,9 @@ def parse_johnstone_invoice(invoice_text):
     lines = invoice_text.split("\n")
     for i in range(len(lines)):
         line = lines[i]
-        if date_re.match(line) and invoice_date_found is False:
-            invoice_date, invoice_number = line.split(" ")
+        if date_re.search(line) and invoice_date_found is False:
+            invoice_date = date_re.search(line).group(0)
+            invoice_number = invoice_number_re.search(line).group(0)
             invoice_date_found = True
 
         if description_re.search(line):
