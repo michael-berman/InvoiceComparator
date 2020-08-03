@@ -1,20 +1,12 @@
+<a href="{% url 'invoiceparser:index' %}"><b>Home</a></b>
+
 <h1>{{ supplier }}</h1>
+
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <ul>
-{% for invoice_item in supplier.invoiceitem_set.all %}
-    <li>{{ invoice_item.description }}</li>
+{% for invoice_item in supplier.invoice_set.all %}
+    <li>{{ invoice_item.invoice_date }}</li>
 {% endfor %}
 </ul>
-
-
-<h1> test form </h1>
-<form action="{% url 'invoiceparser:create' supplier.id %}" method="post">
-    {% csrf_token %}
-    <input type="text" name="description" id="invoice_item_description"><br>
-    <input type="number" name="price" id="invoice_item_price"><br>
-    <input type="datetime-local" name="ship_date" id="invoice_item_date"><br>
-    <input type="submit" value="Create">
-</form>
-
