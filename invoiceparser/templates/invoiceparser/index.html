@@ -20,25 +20,26 @@
     <input type="submit" name="submit" value="Parse" class="button">
 </form>
 
+{% if file_name %}
+    <h3>File: {{ file_name }}</h3>
+{% endif %}
 {% if extracted_text %}
-    <h3>Invoice</h3>
     <form action="{% url 'invoiceparser:create' extracted_text.supplier_id %}" method="post">
         {% csrf_token %} 
-        <h5>Invoice Information</h5>
+        <h4>Invoice Information</h4>
         <div class="invoice-container info-container">
-            <label for="invoice_date">Invoice Date</label>
-            <input type="text" name="invoice_date" value="{{ extracted_text.invoice_date }}"><br>
-            <label for="invoice_number">Invoice Number</label>
-            <input type="text" name="invoice_number" value="{{ extracted_text.invoice_number }}"><br>
+            <label for="invoice_date" class="form-item">Invoice Date</label>
+            <input type="text" name="invoice_date" value="{{ extracted_text.invoice_date }}" class="form-item"><br>
+            <label for="invoice_number" class="form-item">Invoice Number</label>
+            <input type="text" name="invoice_number" value="{{ extracted_text.invoice_number }}" class="form-item"><br>
         </div>
-        <h5>Invoice Items</h5>
+        <h4>Invoice Items</h4>
         {% for item_key, item, price_key, price in extracted_text.line_items %}
             <div class="invoice-container item-container">
-                <label for="{{ item_key  }}" >Invoice Item</label>
-                <textarea name="{{ item_key  }}" rows="3" cols="30">{{ item }}</textarea>
-                {% comment %} <input type="text" name="{{ item_key  }}"  value="{{ item }}" class="form-input"><br> {% endcomment %}
-                <label for="{{ price_key }}" >Item Price</label>
-                <input type="text" name="{{ price_key }}" value="{{ price }}"><br>
+                <label for="{{ item_key  }}" class="form-item">Invoice Item</label>
+                <textarea name="{{ item_key  }}" rows="3" cols="30" class="form-item">{{ item }}</textarea>
+                <label for="{{ price_key }}" class="form-item">Item Price</label>
+                <input type="text" name="{{ price_key }}" value="{{ price }}" class="form-item"><br>
             </div>
         {% endfor %}
         <input type="submit" value="Save" class="button">

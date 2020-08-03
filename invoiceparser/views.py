@@ -12,7 +12,8 @@ def index(request):
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': supplier_list,
-        'extracted_text': {}
+        'extracted_text': {},
+        'file_name': ''
     }
     return render(request, 'invoiceparser/index.html', context)
 
@@ -58,6 +59,7 @@ def upload_file(request):
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': supplier_list,
-        'extracted_text': meta_data
+        'extracted_text': meta_data,
+        'file_name': invoice_file.name
     }
     return render(request, 'invoiceparser/index.html', context)
