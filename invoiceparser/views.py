@@ -1,11 +1,12 @@
+from decimal import Decimal
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 
 
-from .models import Supplier, InvoiceItem
-from .services import save_line_items
+from .models import Supplier, Invoice, InvoiceItem
+from .services import save_line_items, parse_date
 
 
 def index(request):
@@ -31,19 +32,27 @@ def detail(request, supplier_id):
 
 def create(request, supplier_id):
     try:
+        InvoiceItem.objects.all().delete()
         supplier = get_object_or_404(Supplier, pk=supplier_id)
-        description = request.POST['description']
-        price = request.POST['price']
-        ship_date = request.POST['ship_date']
+        invoice = Invoice(supplier=supplier,
+                          invoice_number=request.POST['invoice_number'],
+                          invoice_date=parse_date(request.POST['invoice_date']))
+        invoice.save()
 
-        new_invoice_item = InvoiceItem(
-            supplier=supplier, description=description, price=price, ship_date=ship_date)
-        new_invoice_item.save()
-    except:
+        i = 1
+        while 'item' + str(i) in request.POST:
+            item = request.POST['item' + str(i)]
+            price = request.POST['price' + str(i)]
+            InvoiceItem.objects.create(invoice=invoice,
+                                       description=item,
+                                       price=Decimal(price))
+            i += 1
+
+    except Exception as e:
         context = {
             'supplier': supplier,
             'suppliers': Supplier.objects.order_by('supplier_name'),
-            'error_message': "You must fill out all fields"
+            'error_message': e.args[0]
         }
         return render(request, 'invoiceparser/detail.html', context)
 

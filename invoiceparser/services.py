@@ -2,6 +2,8 @@ import os
 import re
 import ocrmypdf
 import pdfplumber
+from datetime import datetime
+from django.utils.formats import get_format
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
@@ -79,3 +81,14 @@ def convert_with_ocr(invoice_file):
         with pdfplumber.load(invoice_file.file) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
+
+
+def parse_date(date_str):
+    """Parse date from string by DATE_INPUT_FORMATS of current language"""
+    for item in get_format('DATE_INPUT_FORMATS'):
+        try:
+            return datetime.strptime(date_str, item).date()
+        except (ValueError, TypeError):
+            continue
+
+    return None
