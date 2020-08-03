@@ -1,6 +1,9 @@
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'invoiceparser/style.css' %}">
 
+<a href="{% url 'invoiceparser:index' %}"><b>Home</a></b>
+<a href="{% url 'invoiceparser:compare' %}"><b>Compare</a></b>
+
 <h2>Suppliers</h2>
 {% if supplier_list %}
     <ol>

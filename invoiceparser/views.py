@@ -19,6 +19,14 @@ def index(request):
     return render(request, 'invoiceparser/index.html', context)
 
 
+def compare(request):
+    supplier_list = Supplier.objects.order_by('id')
+    context = {
+        'supplier_list': supplier_list
+    }
+    return render(request, 'invoiceparser/compare.html', context)
+
+
 def detail(request, supplier_id):
     supplier = get_object_or_404(Supplier, pk=supplier_id)
     suppliers = Supplier.objects.order_by('supplier_name')
@@ -60,7 +68,7 @@ def create(request, supplier_id):
         }
         return render(request, 'invoiceparser/detail.html', context)
 
-    return HttpResponseRedirect(reverse('invoiceparser:detail', args=(supplier_id,)))
+    return HttpResponseRedirect(reverse('invoiceparser:index', args=(supplier_id,)))
 
 
 def upload_file(request):
