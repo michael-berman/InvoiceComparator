@@ -55,6 +55,8 @@ def save_line_items(invoice_file):
         if supplier:
             meta_data["supplier_id"] = Supplier.objects.filter(
                 supplier_name__icontains=supplier)[0].id
+            meta_data["invoice_date"] = meta_data["invoice_date"].strip()
+            meta_data["invoice_number"] = meta_data["invoice_number"].strip()
             # create item and price keys
             for i in range(len(meta_data['line_items'])):
                 item, price = meta_data['line_items'][i]

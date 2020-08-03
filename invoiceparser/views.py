@@ -32,8 +32,12 @@ def detail(request, supplier_id):
 
 def create(request, supplier_id):
     try:
-        InvoiceItem.objects.all().delete()
         supplier = get_object_or_404(Supplier, pk=supplier_id)
+        invoice = Invoice.objects.get(
+            invoice_number=request.POST['invoice_number'])
+
+        if invoice:
+            raise KeyError("This Invoice has already been uploaded.")
         invoice = Invoice(supplier=supplier,
                           invoice_number=request.POST['invoice_number'],
                           invoice_date=parse_date(request.POST['invoice_date']))
