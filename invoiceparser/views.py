@@ -84,3 +84,13 @@ def upload_file(request):
         'file_name': invoice_file.name
     }
     return render(request, 'invoiceparser/index.html', context)
+
+
+def load_invoice_items(request, supplier_id):
+    invoice_items = Invoice.objects.select_related('invoice') \
+        .filter(supplier_id=supplier_id)
+    # .values_list('')
+    context = {
+        'invoice_items': invoice_items
+    }
+    return render(request, 'hr/city_dropdown_list_options.html',)
