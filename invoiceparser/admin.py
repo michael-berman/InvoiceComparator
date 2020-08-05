@@ -20,10 +20,10 @@ class InvoiceAdmin(admin.ModelAdmin):
         }),
         ('Invoice Information', {
             'fields': (
-                ['invoice_number', 'invoice_date']
+                ['invoice_number', 'invoice_date', 'invoice_file']
             )})
     ]
-    list_display = ('invoice_number', 'invoice_date')
+    list_display = ('invoice_number', 'invoice_date', 'invoice_file')
     list_filter = ['invoice_number', 'invoice_date']
     search_fields = ['invoice_number']
 
