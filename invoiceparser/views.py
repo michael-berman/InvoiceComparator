@@ -1,9 +1,14 @@
+import os
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
+import boto3
+from decouple import config
 
 from .models import Supplier, Invoice, InvoiceItem
 from .services import save_line_items, parse_date
@@ -77,11 +82,23 @@ def upload_file(request):
         if request.FILES['invoice']:
             meta_data = save_line_items(invoice_file)
 
+            with open(invoice_file.name, 'wb+') as f:
+                for chunk in invoice_file.chunks():
+                    f.write(chunk)
+
+            # save file to aws
+            client = boto3.client('s3')
+            response = client.upload_file(
+                Filename=invoice_file.name, Bucket=config(
+                    'AWS_STORAGE_BUCKET_NAME'),
+                Key=invoice_file.name)
+
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': supplier_list,
         'extracted_text': meta_data,
-        'file_name': invoice_file.name
+        'file_name': invoice_file.name,
+        'invoice_file': invoice_file
     }
     return render(request, 'invoiceparser/index.html', context)
 
