@@ -23,13 +23,18 @@
     <input type="submit" name="submit" value="Parse" class="button">
 </form>
 
-{% if file_name %}
+{% comment %} {% if file_name %}
     <h3>File: {{ file_name }}</h3>
-{% endif %}
+{% endif %} {% endcomment %}
 {% if extracted_text %}
-    <form action="{% url 'invoiceparser:create' extracted_text.supplier_id %}" method="post">
+    <form action="{% url 'invoiceparser:create' extracted_text.supplier_id %}" method="post" enctype="multipart/form-data">
         {% csrf_token %} 
         <h4>Invoice Information</h4>
+        <div class="invoice-container info-container">
+            <label for="invoice_date" class="form-item">Invoice Name</label>
+            <input type="text" name="new_invoice_name" value="{{ file_name }}" class="form-item"><br>
+            <input type="text" name="old_invoice_name" value="{{ file_name }}" class="empty-form-item"><br>
+        </div>
         <div class="invoice-container info-container">
             <label for="invoice_date" class="form-item">Invoice Date</label>
             <input type="text" name="invoice_date" value="{{ extracted_text.invoice_date }}" class="form-item"><br>

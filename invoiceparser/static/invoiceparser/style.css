@@ -8,6 +8,10 @@ li a {
     align-items: center;
 }
 
+.empty-form-item {
+    display: none;
+}
+
 .form-input {
     width: 500px;
     margin-left: 20px;
