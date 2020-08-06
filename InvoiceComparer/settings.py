@@ -132,4 +132,4 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 AWS_LOCATION = 'static'
 
-DEFAULT_FILE_STORAGE = 'invoicecomparer.storage_backends.MediaStorage'
+# DEFAULT_FILE_STORAGE = 'invoicecomparer.storage_backends.MediaStorage'

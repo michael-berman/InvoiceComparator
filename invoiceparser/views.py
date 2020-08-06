@@ -1,4 +1,5 @@
 import os
+import tempfile
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
@@ -46,15 +47,33 @@ def detail(request, supplier_id):
 def create(request, supplier_id):
     try:
         supplier = get_object_or_404(Supplier, pk=supplier_id)
-        invoice = Invoice.objects.get(
-            invoice_number=request.POST['invoice_number'])
+        try:
+            invoice = Invoice.objects.get(
+                invoice_number=request.POST['invoice_number'])
+        except Invoice.DoesNotExist:
+            invoice = None
 
         if invoice:
             raise KeyError("This Invoice has already been uploaded.")
+
+        old_invoice_name = request.POST['old_invoice_name']
+        new_invoice_name = request.POST['new_invoice_name']
+
         invoice = Invoice(supplier=supplier,
                           invoice_number=request.POST['invoice_number'],
-                          invoice_date=parse_date(request.POST['invoice_date']))
+                          invoice_date=parse_date(
+                              request.POST['invoice_date']),
+                          invoice_file=new_invoice_name)
         invoice.save()
+
+        file_path = settings.BASE_DIR + '/' + old_invoice_name
+
+        s3 = boto3.resource('s3')
+        s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
+            settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name)
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
         i = 1
         while 'item' + str(i) in request.POST:
@@ -73,32 +92,37 @@ def create(request, supplier_id):
         }
         return render(request, 'invoiceparser/detail.html', context)
 
-    return HttpResponseRedirect(reverse('invoiceparser:index', args=(supplier_id,)))
+    supplier_list = Supplier.objects.order_by('id')
+    context = {
+        'supplier_list': supplier_list,
+        'extracted_text': {},
+        'file_name': ''
+    }
+    return render(request, 'invoiceparser/index.html', context)
 
 
 def upload_file(request):
     if request.method == 'POST':
-        invoice_file = request.FILES['invoice']
+        invoice_file = request.FILES.get('invoice')
         if request.FILES['invoice']:
+            # s3 = boto3.resource('s3')
+            # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_fileobj(
+            #     invoice_file, invoice_file.name)
+
             meta_data = save_line_items(invoice_file)
 
+            # # save file locally first for aws
             with open(invoice_file.name, 'wb+') as f:
                 for chunk in invoice_file.chunks():
                     f.write(chunk)
 
-            # save file to aws
-            client = boto3.client('s3')
-            response = client.upload_file(
-                Filename=invoice_file.name, Bucket=config(
-                    'AWS_STORAGE_BUCKET_NAME'),
-                Key=invoice_file.name)
+            # data = open('test.txt', 'rb')
 
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': supplier_list,
         'extracted_text': meta_data,
         'file_name': invoice_file.name,
-        'invoice_file': invoice_file
     }
     return render(request, 'invoiceparser/index.html', context)
 
