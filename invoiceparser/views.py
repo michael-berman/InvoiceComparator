@@ -70,7 +70,8 @@ def create(request, supplier_id):
 
         s3 = boto3.resource('s3')
         s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-            settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name)
+            settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name,
+            ExtraArgs={'ACL': 'public-read'})
 
         if os.path.isfile(file_path):
             os.remove(file_path)
