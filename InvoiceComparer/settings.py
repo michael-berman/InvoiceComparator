@@ -132,4 +132,6 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 AWS_LOCATION = 'static'
 
+MEDIA_ROOT = "https://" + AWS_S3_CUSTOM_DOMAIN + "/"
+MEDIA_URL = "https://" + AWS_S3_CUSTOM_DOMAIN + "/"
 # DEFAULT_FILE_STORAGE = 'invoicecomparer.storage_backends.MediaStorage'
