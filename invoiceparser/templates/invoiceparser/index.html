@@ -3,53 +3,63 @@
 <link rel="stylesheet" type="text/css" href="{% static 'invoiceparser/style.css' %}">
 {% block content %}
 
-    <h2>Suppliers</h2>
-    {% if supplier_list %}
-        <ol>
-        {% for supplier in supplier_list %}
-            <li><a href="{% url 'invoiceparser:detail' supplier.id %}"><b>{{ supplier.supplier_name }}</a></b>
-            <b>{{supplier.supplier_location}}</b></li>
-        {% endfor %}
-        </ol>
-    {% else %}
-        <p>No suppliers are available.</p>
-    {% endif %}
-
     <h2>Upload:</h2>
     <form action="{% url 'invoiceparser:upload' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="file" name="invoice">
+        <div class="input-group mb-3">
+            <div class="custom-file col-sm-6" >
+                <input type="file" class="custom-file-input" id="invoiceFileInput" name="invoice">
+                <label class="custom-file-label" for="invoiceFileInput">Choose file</label>
+            </div>
+        </div>
         <input class="btn btn-primary" type="submit" name="submit" value="Parse" class="button">
     </form>
 
-    {% comment %} {% if file_name %}
-        <h3>File: {{ file_name }}</h3>
-    {% endif %} {% endcomment %}
     {% if extracted_text %}
         <form action="{% url 'invoiceparser:create' extracted_text.supplier_id %}" method="post" enctype="multipart/form-data">
+            <input type="text" name="old_invoice_name" value="{{ file_name }}" style="display:none;" class="empty-form-item"><br>
             {% csrf_token %} 
             <h4>Invoice Information</h4>
-            <div class="invoice-container info-container">
-                <label for="invoice_date" class="form-item">Invoice Name</label>
-                <input type="text" name="new_invoice_name" value="{{ file_name }}" class="form-item"><br>
-                <input type="text" name="old_invoice_name" value="{{ file_name }}" class="empty-form-item"><br>
+
+            <div class="input-group mb-3 col-sm-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Invoice Name</span>
+                </div>
+                <input type="text" class="form-control" name="new_invoice_name" value="{{ file_name }}">
             </div>
-            <div class="invoice-container info-container">
-                <label for="invoice_date" class="form-item">Invoice Date</label>
-                <input type="text" name="invoice_date" value="{{ extracted_text.invoice_date }}" class="form-item"><br>
-                <label for="invoice_number" class="form-item">Invoice Number</label>
-                <input type="text" name="invoice_number" value="{{ extracted_text.invoice_number }}" class="form-item"><br>
+
+            <div class="input-group mb-3 col-sm-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Invoice Date and Number</span>
+                </div>
+                <input type="text" class="form-control" name="invoice_date" value="{{ extracted_text.invoice_date }}" >
+                <input type="text" class="form-control" name="invoice_number" value="{{ extracted_text.invoice_number }}" >
             </div>
+
             <h4>Invoice Items</h4>
             {% for item_key, item, price_key, price in extracted_text.line_items %}
-                <div class="invoice-container item-container">
-                    <label for="{{ item_key  }}" class="form-item">Invoice Item</label>
-                    <textarea name="{{ item_key  }}" rows="3" cols="30" class="form-item">{{ item }}</textarea>
-                    <label for="{{ price_key }}" class="form-item">Item Price</label>
-                    <input type="text" name="{{ price_key }}" value="{{ price }}" class="form-item"><br>
+                <div class="input-group mb-3 ">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="">Invoice Description and Price</span>
+                    </div>
+                    <textarea type="text" class="form-control"  name="{{ item_key }}" >{{ item }}</textarea>
+                    <textarea type="text" class="form-control col-sm-3"  name="{{ price_key }}">{{ price }}</textarea>
                 </div>
             {% endfor %}
-            <input class="btn btn-primary" type="submit" value="Save" class="button">
+            <button type="submit" class="btn btn-primary">Save</button>
+            {% comment %} <input class="btn btn-primary" type="submit" value="Save" class="button"> {% endcomment %}
         </form>
     {% endif %}
 {% endblock content %}
+
+{% comment %} {% block javascript %}
+
+ <script>
+            $('#invoiceFileInput').on('change',function(){
+                //get the file name
+                var fileName = $(this).val();
+                //replace the "Choose a file" label
+                $(this).next('.custom-file-label').html(fileName);
+            })
+        </script>
+{% endblock javascript %} {% endcomment %}
