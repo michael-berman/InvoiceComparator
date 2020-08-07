@@ -2,7 +2,7 @@ import os
 import tempfile
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.core.files.storage import default_storage
@@ -129,10 +129,11 @@ def upload_file(request):
 
 
 def load_invoice_items(request, supplier_id):
-    invoice_items = Invoice.objects.select_related('invoice') \
-        .filter(supplier_id=supplier_id)
-    # .values_list('')
-    context = {
-        'invoice_items': invoice_items
+    supplier = get_object_or_404(Supplier, pk=supplier_id)
+    invoices = Invoice.objects.filter(supplier=supplier)
+    invoice_items = InvoiceItem.objects.filter(
+        invoice__in=invoices.values('id')).order_by('description').values("description", "price")
+    invoice_items_obj = {
+        "list": invoice_items
     }
-    return render(request, 'hr/city_dropdown_list_options.html',)
+    return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
