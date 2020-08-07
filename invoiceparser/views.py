@@ -132,7 +132,7 @@ def load_invoice_items(request, supplier_id):
     supplier = get_object_or_404(Supplier, pk=supplier_id)
     invoices = Invoice.objects.filter(supplier=supplier)
     invoice_items = InvoiceItem.objects.filter(
-        invoice__in=invoices.values('id')).order_by('description').values("description", "price")
+        invoice__in=invoices.values('id')).order_by('description').values("id", "description", "price")
     invoice_items_obj = {
         "list": invoice_items
     }
