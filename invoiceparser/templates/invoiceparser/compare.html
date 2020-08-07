@@ -1,37 +1,50 @@
-<a href="{% url 'invoiceparser:index' %}"><b>Home</a></b>
-<a href="{% url 'invoiceparser:compare' %}"><b>Compare</a></b>
+{% extends "invoiceparser/base.html" %}
+{% block content %}
+  <h1>Compare</h1>
 
+  <h2>Suppliers</h2>
+  <select name="supplier-select">
+      <option value="">---------</option>
+      {% for supplier in supplier_list %}
+          <option value="{{ supplier.id }}">{{ supplier }}</option>
+      {% endfor %}
+  </select>
+  <select name="supplier-select" id="supplier-select">
+  {% for supplier in supplier_list %}
+      <option value="{{ supplier.id }}">{{ supplier }}</option>
+  {% endfor %}
+  </select>
 
-<h1>Compare</h1>
+  <table id="thetable">
+      <tr>
+          <th>Header 1</th>
+          <th>Header 2</th>
+      </tr>
+      <tr>
+          <td>row 2, cell 1</td>
+          <td>row 2, cell 2</td>
+      </tr>
+  </table>
 
-<h2>Suppliers</h2>
-<select name="supplier-select">
-    <option value="">---------</option>
-    {% for supplier in supplier_list %}
-        <option value="{{ supplier.id }}">{{ supplier }}</option>
-    {% endfor %}
-</select>
-<select name="supplier-select">
-{% for supplier in supplier_list %}
-    <option value="{{ supplier.id }}">{{ supplier }}</option>
-{% endfor %}
-</select>
+{% endblock content %}
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+{% block javascript %}
+
   <script>
-    $("#id_country").change(function () {
-      var url = $("#personForm").attr("data-cities-url");  // get the url of the `load_cities` view
-      var countryId = $(this).val();  // get the selected country ID from the HTML input
-
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'country': countryId       // add the country id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-          $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+    $("#supplier-select").change(function () {
+      $.ajax({                   
+        url: "/invoiceparser/ajax/" + this.value,
+        success: function (data) {
+          console.log(data) 
+          const invoice_items = data.invoice_items;
+          let html = '';
+          for(let i = 0; i < invoice_items.length; i++)
+                      html += '<tr><td>' + invoice_items[i].description + '</td><td>' + invoice_items[i].price + '</td></tr>';
+          $('#thetable tr').first().after(html);
         }
       });
 
     });
   </script>
+
+{% endblock javascript %}
