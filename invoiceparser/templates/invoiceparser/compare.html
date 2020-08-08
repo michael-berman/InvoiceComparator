@@ -1,50 +1,67 @@
 {% extends "invoiceparser/base.html" %}
+{% load static %}
 {% block content %}
-  <h1>Compare</h1>
+<div class="container-fluid">
+  <div class="row">
+    <div class="dropdown mb-3 col first">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Select Supplier
+      </button>
+      <div class="dropdown-menu">
+        <h6 class="dropdown-header">Select Supplier</h6>
+        {% for supplier in supplier_list %}
+          <a class="dropdown-item first-suppler-select-item" href="#" data-id="{{ supplier.id }}">{{ supplier }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="dropdown mb-3 col second">
+      <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Select Supplier
+      </button>
+      <div class="dropdown-menu">
+        <h6 class="dropdown-header">Select Supplier</h6>
+        {% for supplier in supplier_list %}
+          <a class="dropdown-item second-suppler-select-item" href="#" data-id="{{ supplier.id }}">{{ supplier }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  </div>
 
-  <h2>Suppliers</h2>
-  <select name="supplier-select">
-      <option value="">---------</option>
-      {% for supplier in supplier_list %}
-          <option value="{{ supplier.id }}">{{ supplier }}</option>
-      {% endfor %}
-  </select>
-  <select name="supplier-select" id="supplier-select">
-  {% for supplier in supplier_list %}
-      <option value="{{ supplier.id }}">{{ supplier }}</option>
-  {% endfor %}
-  </select>
 
-  <table id="thetable">
+  <div class="row">
+
+    <table class="table table-striped table-bordered col" id="firstTable">
+      <thead>
+        <tr>
+          <th scope="col">Description</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <table class="table table-striped table-bordered col" id="secondTable">
+      <thead>
+        <tr>
+          <th scope="col">Description</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+  {% comment %} <table class="table table-striped table-bordered" id="secondTable">
+    <thead>
       <tr>
-          <th>Header 1</th>
-          <th>Header 2</th>
+        <th scope="col">Description</th>
+        <th scope="col">Price</th>
       </tr>
-      <tr>
-          <td>row 2, cell 1</td>
-          <td>row 2, cell 2</td>
-      </tr>
-  </table>
+    </thead>
+    <tbody>
+    </tbody>
+  </table> {% endcomment %}
 
 {% endblock content %}
-
-{% block javascript %}
-
-  <script>
-    $("#supplier-select").change(function () {
-      $.ajax({                   
-        url: "/invoiceparser/ajax/" + this.value,
-        success: function (data) {
-          console.log(data) 
-          const invoice_items = data.invoice_items;
-          let html = '';
-          for(let i = 0; i < invoice_items.length; i++)
-                      html += '<tr><td>' + invoice_items[i].description + '</td><td>' + invoice_items[i].price + '</td></tr>';
-          $('#thetable tr').first().after(html);
-        }
-      });
-
-    });
-  </script>
-
-{% endblock javascript %}
