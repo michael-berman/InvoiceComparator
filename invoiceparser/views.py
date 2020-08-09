@@ -16,13 +16,7 @@ from .services import save_line_items, parse_date
 
 
 def index(request):
-    supplier_list = Supplier.objects.order_by('id')
-    context = {
-        'supplier_list': supplier_list,
-        'extracted_text': {},
-        'file_name': ''
-    }
-    return render(request, 'invoiceparser/index.html', context)
+    return render(request, 'invoiceparser/index.html')
 
 
 def upload(request):

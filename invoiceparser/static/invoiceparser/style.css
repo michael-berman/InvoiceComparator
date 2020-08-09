@@ -35,3 +35,7 @@ li a {
     padding: 10px 20px;
     cursor: pointer;
 }
+
+.navbar - dark.nav - item>.nav - link.active {
+    color: white;
+}
