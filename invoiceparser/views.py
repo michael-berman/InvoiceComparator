@@ -84,15 +84,14 @@ def create(request, supplier_id):
         if os.path.isfile(file_path):
             os.remove(file_path)
 
-        i = 1
-        while 'item' + str(i) in request.POST:
-            item = request.POST['item' + str(i)]
-            price = request.POST['price' + str(i)]
-            InvoiceItem.objects.create(supplier=supplier,
-                                       invoice=invoice,
-                                       description=item,
-                                       price=Decimal(price))
-            i += 1
+        for i in range(10):
+            if 'item' + str(i) in request.POST:
+                item = request.POST['item' + str(i)]
+                price = request.POST['price' + str(i)]
+                InvoiceItem.objects.create(supplier=supplier,
+                                           invoice=invoice,
+                                           description=item,
+                                           price=Decimal(price))
 
     except Exception as e:
         context = {
