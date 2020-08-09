@@ -30,6 +30,11 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 class InvoiceItemAdmin(admin.ModelAdmin):
     fieldsets = [
+        ('Supplier', {
+            "fields": (
+                ['supplier']
+            ),
+        }),
         ('Invoice', {
             "fields": (
                 ['invoice']
