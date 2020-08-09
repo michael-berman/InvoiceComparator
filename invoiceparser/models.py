@@ -22,6 +22,7 @@ class Invoice(models.Model):
 
 
 class InvoiceItem(models.Model):
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, null=True)
     description = models.CharField(max_length=1000)
     price = models.DecimalField(max_digits=7, decimal_places=2)

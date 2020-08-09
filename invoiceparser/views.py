@@ -88,7 +88,8 @@ def create(request, supplier_id):
         while 'item' + str(i) in request.POST:
             item = request.POST['item' + str(i)]
             price = request.POST['price' + str(i)]
-            InvoiceItem.objects.create(invoice=invoice,
+            InvoiceItem.objects.create(supplier=supplier,
+                                       invoice=invoice,
                                        description=item,
                                        price=Decimal(price))
             i += 1
@@ -160,6 +161,6 @@ def load_invoices(request, supplier_id):
 def search_invoice_items(request, supplier_id, search):
     supplier = get_object_or_404(Supplier, pk=supplier_id)
     invoices = Invoice.objects.filter(supplier=supplier)
-    invoice_items = InvoiceItem.objects.filter(
-        invoice__in=invoices.values('id')).order_by('description').values("id", "description", "price")
+    invoice_items = InvoiceItem.objects.filter(supplier=supplier).order_by(
+        'description').values("id", "description", "price")
     return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
