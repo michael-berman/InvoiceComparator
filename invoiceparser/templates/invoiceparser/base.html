@@ -14,8 +14,11 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'invoiceparser:index' %}">Home <span class="sr-only">(current)</span></a>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'invoiceparser:index' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'invoiceparser:upload' %}">Upload</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'invoiceparser:compare' %}">Compare</a>
@@ -23,6 +26,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'invoiceparser:invoice_list' %}">Invoices</a>
         </li>
+        {% comment %} <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+        </li> {% endcomment %}
       </ul>
     </div>
   </nav>
@@ -42,6 +48,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
     integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous">
   </script>
+  <script src="{% static 'invoiceparser/base.js' %}"></script>
   <script src="{% static 'invoiceparser/compare.js' %}"></script>
   <script src="{% static 'invoiceparser/invoice_list.js' %}"></script>
   <script src="{% static 'invoiceparser/upload.js' %}"></script>

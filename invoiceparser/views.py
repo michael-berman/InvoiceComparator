@@ -1,7 +1,7 @@
 import os
 import tempfile
 from decimal import Decimal
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
@@ -23,6 +23,16 @@ def index(request):
         'file_name': ''
     }
     return render(request, 'invoiceparser/index.html', context)
+
+
+def upload(request):
+    supplier_list = Supplier.objects.order_by('id')
+    context = {
+        'supplier_list': supplier_list,
+        'extracted_text': {},
+        'file_name': ''
+    }
+    return render(request, 'invoiceparser/upload.html', context)
 
 
 def compare(request):
@@ -107,7 +117,9 @@ def create(request, supplier_id):
         'extracted_text': {},
         'file_name': ''
     }
-    return render(request, 'invoiceparser/index.html', context)
+    # return HttpResponseRedirect('invoiceparser/compare.html')
+    # return render(request, 'invoiceparser/compare.html')
+    return redirect('/invoiceparser/compare')
 
 
 def upload_file(request):
@@ -129,11 +141,12 @@ def upload_file(request):
 
     supplier_list = Supplier.objects.order_by('id')
     context = {
-        'supplier_list': supplier_list,
+        'supplier_list': list(supplier_list),
         'extracted_text': meta_data,
         'file_name': invoice_file.name,
     }
-    return render(request, 'invoiceparser/index.html', context)
+
+    return render(request, 'invoiceparser/upload.html', context)
 
 
 def load_invoice_items(request, supplier_id, search=''):
