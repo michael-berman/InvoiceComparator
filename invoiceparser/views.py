@@ -26,11 +26,19 @@ def index(request):
 
 
 def compare(request):
-    supplier_list = Supplier.objects.order_by('id')
+    supplier_list = Supplier.objects.order_by('supplier_name')
     context = {
         'supplier_list': supplier_list
     }
     return render(request, 'invoiceparser/compare.html', context)
+
+
+def invoice_list(request):
+    supplier_list = Supplier.objects.order_by('supplier_name')
+    context = {
+        'supplier_list': supplier_list
+    }
+    return render(request, 'invoiceparser/invoice_list.html', context)
 
 
 def detail(request, supplier_id):
@@ -133,7 +141,15 @@ def load_invoice_items(request, supplier_id):
     invoices = Invoice.objects.filter(supplier=supplier)
     invoice_items = InvoiceItem.objects.filter(
         invoice__in=invoices.values('id')).order_by('description').values("id", "description", "price")
-    invoice_items_obj = {
-        "list": invoice_items
-    }
     return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
+
+
+def load_invoices(request, supplier_id):
+    supplier = get_object_or_404(Supplier, pk=supplier_id)
+    invoices = Invoice.objects.filter(supplier=supplier).values(
+        "invoice_number", "invoice_date", "invoice_file")
+
+    invoice_list = list(invoices)
+    for invoice in invoice_list:
+        invoice["invoice_file"] = settings.MEDIA_URL + invoice["invoice_file"]
+    return JsonResponse({"invoices": list(invoices)}, status=200)
