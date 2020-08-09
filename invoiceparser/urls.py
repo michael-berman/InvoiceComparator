@@ -12,6 +12,8 @@ urlpatterns = [
     path('upload', views.upload_file, name="upload"),
     path('ajax/invoiceitems/<int:supplier_id>/',
          views.load_invoice_items, name="load_invoice_items"),
+    path('ajax/invoiceitems/<int:supplier_id>/<str:search>',
+         views.load_invoice_items, name="load_invoice_items"),
     path('ajax/invoices/<int:supplier_id>/',
          views.load_invoices, name="load_invoices"),
 

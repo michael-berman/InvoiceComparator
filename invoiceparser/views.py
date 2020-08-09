@@ -136,11 +136,13 @@ def upload_file(request):
     return render(request, 'invoiceparser/index.html', context)
 
 
-def load_invoice_items(request, supplier_id):
+def load_invoice_items(request, supplier_id, search=''):
     supplier = get_object_or_404(Supplier, pk=supplier_id)
     invoices = Invoice.objects.filter(supplier=supplier)
     invoice_items = InvoiceItem.objects.filter(
         invoice__in=invoices.values('id')).order_by('description').values("id", "description", "price")
+    if search:
+        invoice_items = invoice_items.filter(description__icontains=search)
     return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
 
 
@@ -153,3 +155,11 @@ def load_invoices(request, supplier_id):
     for invoice in invoice_list:
         invoice["invoice_file"] = settings.MEDIA_URL + invoice["invoice_file"]
     return JsonResponse({"invoices": list(invoices)}, status=200)
+
+
+def search_invoice_items(request, supplier_id, search):
+    supplier = get_object_or_404(Supplier, pk=supplier_id)
+    invoices = Invoice.objects.filter(supplier=supplier)
+    invoice_items = InvoiceItem.objects.filter(
+        invoice__in=invoices.values('id')).order_by('description').values("id", "description", "price")
+    return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
