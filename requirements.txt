@@ -1,6 +1,6 @@
 django
 gunicorn
 django-heroku
-python-decouple==3.1
+python-decouple==3.3
 pdfplumber
 ocrmypdf
