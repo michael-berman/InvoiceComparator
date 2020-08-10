@@ -5,3 +5,4 @@ python-decouple==3.3
 django-storages==1.9.1
 pdfplumber
 ocrmypdf
+boto3
