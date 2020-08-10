@@ -6,3 +6,5 @@ django-storages==1.9.1
 pdfplumber==0.5.22
 ocrmypdf==10.3.0
 boto3==1.14.35
+ghostscript==0.6
+pytesseract==0.3.4
