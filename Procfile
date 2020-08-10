@@ -1,1 +1,1 @@
-web: gunicorn InvoiceComparer.wsgi
+web: gunicorn InvoiceComparer.wsgi --log-file -
