@@ -1,6 +1,6 @@
 django
 gunicorn
 django-heroku
-python-decouple
+decouple
 pdfplumber
 ocrmypdf
