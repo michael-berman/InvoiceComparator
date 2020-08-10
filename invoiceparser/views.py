@@ -152,9 +152,9 @@ def upload_file(request):
 
 def load_invoice_items(request, supplier_id, search=''):
     supplier = get_object_or_404(Supplier, pk=supplier_id)
-    invoices = Invoice.objects.filter(supplier=supplier)
-    invoice_items = InvoiceItem.objects.filter(
-        invoice__in=invoices.values('id')).order_by('description').values("id", "description", "price")
+    # invoices = Invoice.objects.filter(supplier=supplier)
+    invoice_items = InvoiceItem.objects.filter(supplier=supplier).order_by(
+        'description').values("id", "description", "price")
     if search:
         invoice_items = invoice_items.filter(description__icontains=search)
     return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
