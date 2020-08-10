@@ -16,7 +16,11 @@ from .services import save_line_items, parse_date
 
 
 def index(request):
-    return render(request, 'invoiceparser/index.html')
+    supplier_list = Supplier.objects.order_by('id')
+    context = {
+        'supplier_list': supplier_list
+    }
+    return render(request, 'invoiceparser/index.html', context)
 
 
 def upload(request):
@@ -59,34 +63,37 @@ def detail(request, supplier_id):
 def create(request, supplier_id):
     try:
         supplier = get_object_or_404(Supplier, pk=supplier_id)
+        invoice = None
         try:
-            invoice = Invoice.objects.get(
-                invoice_number=request.POST['invoice_number'])
+            if 'invoice_number' in request.POST:
+                invoice = Invoice.objects.get(
+                    invoice_number=request.POST['invoice_number'])
         except Invoice.DoesNotExist:
             invoice = None
 
         if invoice:
             raise KeyError("This Invoice has already been uploaded.")
 
-        old_invoice_name = request.POST['old_invoice_name']
-        new_invoice_name = request.POST['new_invoice_name']
+        if 'items-only' not in request.POST:
+            old_invoice_name = request.POST['old_invoice_name']
+            new_invoice_name = request.POST['new_invoice_name']
 
-        invoice = Invoice(supplier=supplier,
-                          invoice_number=request.POST['invoice_number'],
-                          invoice_date=parse_date(
-                              request.POST['invoice_date']),
-                          invoice_file=new_invoice_name)
-        invoice.save()
+            invoice = Invoice(supplier=supplier,
+                              invoice_number=request.POST['invoice_number'],
+                              invoice_date=parse_date(
+                                  request.POST['invoice_date']),
+                              invoice_file=new_invoice_name)
+            invoice.save()
 
-        file_path = settings.BASE_DIR + '/' + old_invoice_name
+            file_path = settings.BASE_DIR + '/' + old_invoice_name
 
-        s3 = boto3.resource('s3')
-        s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-            settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name,
-            ExtraArgs={'ACL': 'public-read'})
+            s3 = boto3.resource('s3')
+            s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
+                settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name,
+                ExtraArgs={'ACL': 'public-read'})
 
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
         for i in range(10):
             if 'item' + str(i) in request.POST:

@@ -5,4 +5,42 @@
 <h4><a href="{% url 'invoiceparser:upload' %}">Upload</a> - Upload Invoices</h4>
 <h4><a href="{% url 'invoiceparser:compare' %}">Compare</a> - Compare Invoice items</h4>
 <h4><a href="{% url 'invoiceparser:invoice_list' %}">Invoices</a> - Downloadable Invoices</h4>
+<hr /><br />
+<h3 class="mb-4">Add items</h3>
+<div class="container-fluid mb-3">
+    <div class="row">
+        <div class="dropdown col-2">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton4"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Supplier
+            </button>
+            <div class="dropdown-menu">
+                <h6 class="dropdown-header">Select Supplier</h6>
+                {% for supplier in supplier_list %}
+                <a class="dropdown-item supplier-select-item" href="#" data-id="{{ supplier.id }}">{{ supplier }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <button class="btn btn-info" id="add-line-button" type="button">Add Line</button>
+    </div>
+</div>
+
+
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div id='line-item-container'>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Invoice Description and Price</span>
+            </div>
+            <textarea type="text" class="form-control" name="item1"></textarea>
+            <textarea type="text" class="form-control col-sm-3" name="price1"></textarea>
+            <div class="input-group-append">
+                <button class="btn btn-danger delete-line-button" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-primary save-line-button" type="button">Save</button>
+</form>
 {% endblock content %}
