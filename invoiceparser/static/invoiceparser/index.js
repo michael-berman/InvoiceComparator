@@ -43,6 +43,11 @@ function getCookie(name) {
 
 $('.save-line-button').click(function () {
     const supplier_id = $("#dropdownMenuButton4:first-child").data('id');
+
+    if (!supplier_id) {
+        alert("Please select Supplier.")
+    }
+
     let data = {};
     data["items-only"] = true;
     [...Array(11).keys()].forEach(num => {
@@ -58,8 +63,16 @@ $('.save-line-button').click(function () {
         },
         url: `/invoiceparser/${supplier_id}/create/`,
         data,
-        success: function () {
-            console.log('success')
+        success: function (res) {
+            console.log(res)
+            //empty out the line item container 
+            const container = $("#line-item-container");
+            container.empty()
+
+            // reset supplier select
+            $("#dropdownMenuButton4:first-child").text($(this).text());
+            $("#dropdownMenuButton4:first-child").val($(this).text());
+            $("#dropdownMenuButton4:first-child").data('id', $(this).data("id"));
         }
     });
 })
