@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 from decouple import config, Csv
+import django_heroku
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -135,3 +136,7 @@ AWS_LOCATION = 'static'
 MEDIA_ROOT = "https://" + AWS_S3_CUSTOM_DOMAIN + "/"
 MEDIA_URL = "https://" + AWS_S3_CUSTOM_DOMAIN + "/"
 # DEFAULT_FILE_STORAGE = 'invoicecomparer.storage_backends.MediaStorage'
+
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
