@@ -1,8 +1,8 @@
-django
-gunicorn
-django-heroku
+django==3.0.7
+gunicorn==20.0.4
+django-heroku==0.3.1
 python-decouple==3.3
 django-storages==1.9.1
-pdfplumber
-ocrmypdf
-boto3
+pdfplumber==0.5.22
+ocrmypdf==10.3.0
+boto3==1.14.35
