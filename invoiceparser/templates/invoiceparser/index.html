@@ -1,8 +1,8 @@
 {% extends "invoiceparser/base.html" %}
 {% load static %}
 {% block content %}
-<h1>Welcome to Invoice Parser</h1>
-<h4><a href="{% url 'invoiceparser:upload' %}">Upload</a> - Upload Invoices</h4>
+{% comment %} <h1>Welcome to Invoice Parser</h1> {% endcomment %}
+{% comment %} <h4><a href="{% url 'invoiceparser:upload' %}">Upload</a> - Upload Invoices</h4> {% endcomment %}
 <h4><a href="{% url 'invoiceparser:compare' %}">Compare</a> - Compare Invoice items</h4>
 <h4><a href="{% url 'invoiceparser:invoice_list' %}">Invoices</a> - Downloadable Invoices</h4>
 <hr /><br />
