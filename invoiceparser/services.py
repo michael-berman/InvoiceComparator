@@ -5,6 +5,8 @@ import pdfplumber
 from datetime import datetime
 from django.utils.formats import get_format
 
+from django_rq import job
+
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
 from .service_carrier import parse_carrier_invoice
@@ -14,6 +16,7 @@ from .service_ferguson import parse_ferguson_invoice
 from .models import Supplier
 
 
+@job
 def save_line_items(invoice_file):
     invoice_text = convert_with_ocr(invoice_file)
     if os.path.exists(invoice_file.name):

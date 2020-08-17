@@ -131,7 +131,7 @@ def upload_file(request):
             # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_fileobj(
             #     invoice_file, invoice_file.name)
 
-            meta_data = save_line_items(invoice_file)
+            meta_data = save_line_items.delay(invoice_file)
 
             # # save file locally first for aws
             with open(invoice_file.name, 'wb+') as f:

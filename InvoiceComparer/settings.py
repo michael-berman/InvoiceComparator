@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pdfplumber',
     'storages',
+    'django_rq'
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,13 @@ MEDIA_URL = "https://" + AWS_S3_CUSTOM_DOMAIN + "/"
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+
+# setup django Redis Queue
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0
+    }
+}
