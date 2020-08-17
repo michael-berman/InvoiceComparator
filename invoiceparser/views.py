@@ -124,6 +124,7 @@ def create(request, supplier_id):
 
 
 def upload_file(request):
+    meta_data = {}
     if request.method == 'POST':
         invoice_file = request.FILES.get('invoice')
         if request.FILES['invoice']:
