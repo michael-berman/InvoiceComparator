@@ -15,6 +15,12 @@ from .models import Supplier, Invoice, InvoiceItem
 from .services import save_line_items, parse_date
 
 
+from rq import Queue
+from InvoiceComparer.worker import conn
+
+redis_queue = Queue(connection=conn)
+
+
 def index(request):
     supplier_list = Supplier.objects.order_by('id')
     context = {
@@ -131,8 +137,9 @@ def upload_file(request):
             # s3 = boto3.resource('s3')
             # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_fileobj(
             #     invoice_file, invoice_file.name)
-
-            meta_data = save_line_items.delay(invoice_file)
+            meta_data = redis_queue.enqueue(
+                save_line_items, invoice_file)
+            # meta_data = save_line_items.delay(invoice_file)
 
             # # save file locally first for aws
             with open(invoice_file.name, 'wb+') as f:
@@ -144,7 +151,7 @@ def upload_file(request):
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': list(supplier_list),
-        'extracted_text': meta_data,
+        'extracted_text': meta_data.return_value,
         'file_name': invoice_file.name,
     }
 

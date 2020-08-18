@@ -118,7 +118,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -147,19 +146,10 @@ django_heroku.settings(locals())
 RQ_QUEUES = {
     'default': {
         'HOST': 'localhost',
-        'PORT': 6379,
+        'PORT': '6379',
+        # If you're
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379'),
         'DB': 0,
-        'DEFAULT_TIMEOUT': 500
-    },
-    # 'high': {
-    #     # If you're on Heroku
-    #     'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'),
-    #     'DEFAULT_TIMEOUT': 500,
-    # },
-    'low': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-        'DEFAULT_TIMEOUT': 500,
+        'DEFAULT_TIMEOUT': 480,
     }
 }
