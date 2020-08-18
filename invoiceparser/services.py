@@ -4,6 +4,7 @@ import ocrmypdf
 import pdfplumber
 from datetime import datetime
 from django.utils.formats import get_format
+from io import BytesIO
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
@@ -13,11 +14,22 @@ from .service_ferguson import parse_ferguson_invoice
 
 from .models import Supplier
 
+import boto3
+from decouple import config
 
-def save_line_items(invoice_file):
-    invoice_text = convert_with_ocr(invoice_file)
-    if os.path.exists(invoice_file.name):
-        os.remove(invoice_file.name)
+
+def save_line_items(invoice_file_name):
+
+    invoice_text = ''
+    resource = boto3.resource('s3',
+                              aws_access_key_id=config(
+                                  'AWS_ACCESS_KEY_ID'),
+                              aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'))
+    response = resource.Object(config('AWS_STORAGE_BUCKET_NAME'),
+                               invoice_file_name).get()
+    file_bytes = response['Body'].read()
+
+    invoice_text = convert_with_ocr(BytesIO(file_bytes), invoice_file_name)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
@@ -69,18 +81,17 @@ def save_line_items(invoice_file):
     return meta_data
 
 
-def convert_with_ocr(invoice_file):
-
+def convert_with_ocr(invoice_file, invoice_file_name):
     try:
-        ocrmypdf.ocr(invoice_file.file, invoice_file.name,
+        ocrmypdf.ocr(invoice_file, invoice_file_name,
                      deskew=True, force_ocr=True)
-        temp_file = open(invoice_file.name, "r")
+        temp_file = open(invoice_file_name, "r")
 
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
     except Exception:
-        with pdfplumber.load(invoice_file.file) as pdf:
+        with pdfplumber.load(invoice_file) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
 

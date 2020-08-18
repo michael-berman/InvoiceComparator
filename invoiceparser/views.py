@@ -93,10 +93,10 @@ def create(request, supplier_id):
 
             file_path = settings.BASE_DIR + '/' + old_invoice_name
 
-            s3 = boto3.resource('s3')
-            s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-                settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name,
-                ExtraArgs={'ACL': 'public-read'})
+            # s3 = boto3.resource('s3')
+            # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
+            #     settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name,
+            #     ExtraArgs={'ACL': 'public-read'})
 
             if os.path.isfile(file_path):
                 os.remove(file_path)
@@ -137,8 +137,6 @@ def upload_file(request):
             # s3 = boto3.resource('s3')
             # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_fileobj(
             #     invoice_file, invoice_file.name)
-            meta_data = redis_queue.enqueue(
-                save_line_items, invoice_file)
             # meta_data = save_line_items.delay(invoice_file)
 
             # # save file locally first for aws
@@ -146,7 +144,14 @@ def upload_file(request):
                 for chunk in invoice_file.chunks():
                     f.write(chunk)
 
+            s3 = boto3.resource('s3')
+            s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
+                settings.BASE_DIR + '/' + invoice_file.name, invoice_file.name,
+                ExtraArgs={'ACL': 'public-read'})
             # data = open('test.txt', 'rb')
+
+            meta_data = redis_queue.enqueue(
+                save_line_items, invoice_file.name)
 
     supplier_list = Supplier.objects.order_by('id')
     context = {
