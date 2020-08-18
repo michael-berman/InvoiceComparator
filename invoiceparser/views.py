@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 import boto3
 from decouple import config
 
@@ -139,14 +140,21 @@ def upload_file(request):
             #     invoice_file, invoice_file.name)
             # meta_data = save_line_items.delay(invoice_file)
 
+            if not os.path.exists('temp/'):
+                os.makedirs('temp/')
+
             # # save file locally first for aws
-            with open(invoice_file.name, 'wb+') as f:
-                for chunk in invoice_file.chunks():
-                    f.write(chunk)
+            folder = 'temp/'
+            fs = FileSystemStorage(location=folder)
+            filename = fs.save(invoice_file.name, invoice_file)
+            fs.url(filename)
+            # with open(invoice_file.name, 'wb+') as f:
+            #     for chunk in invoice_file.chunks():
+            #         f.write(chunk)
 
             s3 = boto3.resource('s3')
             s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-                settings.BASE_DIR + '/' + invoice_file.name, invoice_file.name,
+                'temp/' + invoice_file.name, invoice_file.name,
                 ExtraArgs={'ACL': 'public-read'})
             # data = open('test.txt', 'rb')
 

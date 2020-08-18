@@ -5,6 +5,7 @@ import pdfplumber
 from datetime import datetime
 from django.utils.formats import get_format
 from io import BytesIO
+from django.conf import settings
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
@@ -83,9 +84,9 @@ def save_line_items(invoice_file_name):
 
 def convert_with_ocr(invoice_file, invoice_file_name):
     try:
-        ocrmypdf.ocr(invoice_file, "ocr_" + invoice_file_name,
+        ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
                      deskew=True, force_ocr=True)
-        temp_file = open("ocr_" + invoice_file_name, "r")
+        temp_file = open('temp/ocr_' + invoice_file_name, "r")
 
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
