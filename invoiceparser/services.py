@@ -83,18 +83,14 @@ def save_line_items(invoice_file_name):
 
 def convert_with_ocr(invoice_file, invoice_file_name):
     try:
-        print("86")
-        ocrmypdf.ocr(invoice_file, invoice_file_name,
+        ocrmypdf.ocr(invoice_file, "ocr_" + invoice_file_name,
                      deskew=True, force_ocr=True)
-        print("89")
-        temp_file = open(invoice_file_name, "r")
-        print("91")
+        temp_file = open("ocr_" + invoice_file_name, "r")
 
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
     except Exception:
-        print("91" + str(Exception))
         with pdfplumber.load(invoice_file) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
