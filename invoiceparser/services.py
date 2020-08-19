@@ -35,7 +35,7 @@ def save_line_items(invoice_file):
 
     s3 = boto3.resource('s3')
     s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-        'temp/ocr_' + invoice_file.name, invoice_file.name,
+        'temp/ocr_' + invoice_file.name, "ocr_" + invoice_file.name,
         ExtraArgs={'ACL': 'public-read'})
 
     invoice_text = ''
@@ -95,6 +95,7 @@ def convert_with_ocr(invoice_file):
     try:
         # ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
         #              deskew=True, force_ocr=True)
+        print(invoice_file)
         temp_file = open('temp/ocr_' + invoice_file.name, "r")
 
         with pdfplumber.load(temp_file.buffer) as pdf:
