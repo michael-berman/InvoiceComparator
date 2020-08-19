@@ -136,34 +136,9 @@ def upload_file(request):
     if request.method == 'POST':
         invoice_file = request.FILES.get('invoice')
         if request.FILES['invoice']:
-            # s3 = boto3.resource('s3')
-            # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_fileobj(
-            #     invoice_file, invoice_file.name)
-            # meta_data = save_line_items.delay(invoice_file)
-
-            if not os.path.exists('temp/'):
-                os.makedirs('temp/')
-
-            # # save file locally first for aws
-            folder = 'temp/'
-            fs = FileSystemStorage(location=folder)
-            filename = fs.save(invoice_file.name, invoice_file)
-
-            ocrmypdf.ocr('temp/' + invoice_file.name, 'temp/ocr_' + invoice_file.name,
-                         deskew=True, force_ocr=True)
-            # with open(invoice_file.name, 'wb+') as f:
-            #     for chunk in invoice_file.chunks():
-            #         f.write(chunk)
-
-            s3 = boto3.resource('s3')
-            s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-                'temp/ocr_' + invoice_file.name, invoice_file.name,
-                ExtraArgs={'ACL': 'public-read'})
-            # data = open('test.txt', 'rb')
-
             # meta_data = redis_queue.enqueue(
             #     save_line_items, invoice_file.name)
-            meta_data = save_line_items(invoice_file.name)
+            meta_data = save_line_items(invoice_file)
 
     supplier_list = Supplier.objects.order_by('id')
     context = {

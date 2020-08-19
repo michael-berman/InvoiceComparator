@@ -6,6 +6,7 @@ from datetime import datetime
 from django.utils.formats import get_format
 from io import BytesIO
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
@@ -19,18 +20,26 @@ import boto3
 from decouple import config
 
 
-def save_line_items(invoice_file_name):
+def save_line_items(invoice_file):
+
+    if not os.path.exists('temp/'):
+        os.makedirs('temp/')
+
+        # # save file locally first for aws
+    folder = 'temp/'
+    fs = FileSystemStorage(location=folder)
+    filename = fs.save(invoice_file.name, invoice_file)
+
+    ocrmypdf.ocr('temp/' + invoice_file.name, 'temp/ocr_' + invoice_file.name,
+                 deskew=True, force_ocr=True)
+
+    s3 = boto3.resource('s3')
+    s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
+        'temp/ocr_' + invoice_file.name, invoice_file.name,
+        ExtraArgs={'ACL': 'public-read'})
 
     invoice_text = ''
-    resource = boto3.resource('s3',
-                              aws_access_key_id=config(
-                                  'AWS_ACCESS_KEY_ID'),
-                              aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'))
-    response = resource.Object(config('AWS_STORAGE_BUCKET_NAME'),
-                               invoice_file_name).get()
-    file_bytes = response['Body'].read()
-
-    invoice_text = convert_with_ocr(BytesIO(file_bytes), invoice_file_name)
+    invoice_text = convert_with_ocr(invoice_file)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
@@ -82,13 +91,13 @@ def save_line_items(invoice_file_name):
     return meta_data
 
 
-def convert_with_ocr(invoice_file, invoice_file_name):
+def convert_with_ocr(invoice_file):
     try:
         # ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
         #              deskew=True, force_ocr=True)
-        # temp_file = open('temp/ocr_' + invoice_file_name, "r")
+        temp_file = open('temp/ocr_' + invoice_file.name, "r")
 
-        with pdfplumber.load(invoice_file) as pdf:
+        with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
     except Exception as err:
