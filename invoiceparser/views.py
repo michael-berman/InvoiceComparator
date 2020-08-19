@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import boto3
 from decouple import config
+import ocrmypdf
 
 from .models import Supplier, Invoice, InvoiceItem
 from .services import save_line_items, parse_date
@@ -147,24 +148,27 @@ def upload_file(request):
             folder = 'temp/'
             fs = FileSystemStorage(location=folder)
             filename = fs.save(invoice_file.name, invoice_file)
-            fs.url(filename)
+
+            ocrmypdf.ocr('temp/' + invoice_file.name, 'temp/ocr_' + invoice_file.name,
+                         deskew=True, force_ocr=True)
             # with open(invoice_file.name, 'wb+') as f:
             #     for chunk in invoice_file.chunks():
             #         f.write(chunk)
 
             s3 = boto3.resource('s3')
             s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-                'temp/' + invoice_file.name, invoice_file.name,
+                'temp/ocr_' + invoice_file.name, invoice_file.name,
                 ExtraArgs={'ACL': 'public-read'})
             # data = open('test.txt', 'rb')
 
-            meta_data = redis_queue.enqueue(
-                save_line_items, invoice_file.name)
+            # meta_data = redis_queue.enqueue(
+            #     save_line_items, invoice_file.name)
+            meta_data = save_line_items(invoice_file.name)
 
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': list(supplier_list),
-        'extracted_text': meta_data.return_value,
+        'extracted_text': meta_data,
         'file_name': invoice_file.name,
     }
 

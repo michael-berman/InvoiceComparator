@@ -84,14 +84,15 @@ def save_line_items(invoice_file_name):
 
 def convert_with_ocr(invoice_file, invoice_file_name):
     try:
-        ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
-                     deskew=True, force_ocr=True)
-        temp_file = open('temp/ocr_' + invoice_file_name, "r")
+        # ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
+        #              deskew=True, force_ocr=True)
+        # temp_file = open('temp/ocr_' + invoice_file_name, "r")
 
-        with pdfplumber.load(temp_file.buffer) as pdf:
+        with pdfplumber.load(invoice_file) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
-    except Exception:
+    except Exception as err:
+        print('Handling run-time error:', err)
         with pdfplumber.load(invoice_file) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
