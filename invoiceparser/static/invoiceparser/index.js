@@ -61,7 +61,7 @@ $('.save-line-button').click(function () {
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
         },
-        url: `/invoiceparser/${supplier_id}/create/`,
+        url: `/${supplier_id}/create/`,
         data,
         success: function (res) {
             console.log(res)

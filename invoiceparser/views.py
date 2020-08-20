@@ -128,7 +128,7 @@ def create(request, supplier_id):
     }
     # return HttpResponseRedirect('invoiceparser/compare.html')
     # return render(request, 'invoiceparser/compare.html')
-    return redirect('/invoiceparser/compare')
+    return redirect('/compare')
 
 
 def upload_file(request):
