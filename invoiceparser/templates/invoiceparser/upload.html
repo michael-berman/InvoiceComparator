@@ -17,9 +17,9 @@
 
 {% if extracted_text %}
 <form action="{% url 'invoiceparser:create' extracted_text.supplier_id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
     <input type="text" name="old_invoice_name" value="{{ file_name }}" style="display:none;"
         class="empty-form-item"><br>
-    {% csrf_token %}
     <h4>Invoice Information</h4>
 
     <div class="input-group mb-3 col-sm-6">
