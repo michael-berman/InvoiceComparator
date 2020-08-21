@@ -107,7 +107,7 @@ def convert_with_ocr(invoice_file):
         # ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
         #              deskew=True, force_ocr=True)
         print(invoice_file)
-        temp_file = open('temp/ocr_' + invoice_file.name, "r")
+        temp_file = open('temp/' + invoice_file.name, "r")
 
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
