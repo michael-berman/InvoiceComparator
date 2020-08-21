@@ -33,24 +33,24 @@ def save_line_items(invoice_file):
     temp_file_name = 'temp/' + invoice_file.name
     temp_ocr_file_name = 'temp/ocr_' + invoice_file.name
 
-    ocrmypdf.ocr(temp_file_name, temp_ocr_file_name,
+    ocrmypdf.ocr(temp_file_name, temp_file_name,
                  force_ocr=True, optimize=0)
 
     # delete temp file since new file has ocr_ prefix
-    if os.path.isfile(temp_file_name):
-        os.remove(temp_file_name)
+    # if os.path.isfile(temp_file_name):
+    #     os.remove(temp_file_name)
 
     s3 = boto3.resource('s3', aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
                         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),)
     s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-        temp_ocr_file_name, "ocr_" + invoice_file.name,
+        temp_file_name, "ocr_" + invoice_file.name,
         ExtraArgs={'ACL': 'public-read'})
 
     invoice_text = ''
     invoice_text = convert_with_ocr(invoice_file)
 
-    if os.path.isfile(temp_ocr_file_name):
-        os.remove(temp_ocr_file_name)
+    if os.path.isfile(temp_file_name):
+        os.remove(temp_file_name)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
