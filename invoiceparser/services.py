@@ -108,13 +108,15 @@ def convert_with_ocr(invoice_file):
         #              deskew=True, force_ocr=True)
         print(invoice_file)
         temp_file = open('temp/' + invoice_file.name, "r")
+        print(temp_file)
 
         with pdfplumber.load(temp_file.buffer) as pdf:
+            print("extracting...")
             page = pdf.pages[0]
             return page.extract_text()
     except Exception as err:
         print('Handling run-time error:', err)
-        with pdfplumber.load(invoice_file) as pdf:
+        with pdfplumber.load('temp/' + invoice_file.name) as pdf:
             page = pdf.pages[0]
             return page.extract_text()
 
