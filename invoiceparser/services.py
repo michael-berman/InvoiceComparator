@@ -34,7 +34,8 @@ def save_line_items(invoice_file):
     temp_ocr_file_name = 'temp/ocr_' + invoice_file.name
 
     try:
-        ocrmypdf.ocr(temp_file_name, temp_file_name, optimize=0)
+        ocrmypdf.ocr(temp_file_name, temp_file_name,
+                     force_ocr=True, optimize=0, output_type='pdf', fast_web_view=0)
     except Exception as err:
         print('Handling run-time error:', err)
 
