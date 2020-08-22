@@ -55,8 +55,11 @@ def parse_ferguson_invoice(invoice_text):
 
                     current_item = first_half_line_item_re.search(
                         description_line).group(0)
-                    current_item = second_half_line_item_re.search(
-                        current_item).group(1)
+                    try:
+                        current_item = second_half_line_item_re.search(
+                            current_item).group(1)
+                    except Exception:
+                        print("Error has occured")
 
                     if price_re.search(description_line):
                         current_price = price_re.search(
