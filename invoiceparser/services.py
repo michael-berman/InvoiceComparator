@@ -5,13 +5,14 @@ from django.utils.formats import get_format
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
+import pandas as pd
 import pytesseract
 import ghostscript
 import locale
 import boto3
 from decouple import config
 import cv2
-import numpy
+import numpy as np
 
 from .models import Supplier
 
@@ -31,7 +32,7 @@ def save_line_items(invoice_file):
     folder = 'temp/'
     fs = FileSystemStorage(location=folder)
     filename = fs.save(invoice_file.name, invoice_file)
-    temp_pdf_path = 'temp/' + invoice_file.name
+    temp_pdf_path = 'temp/' + filename
 
     # Save to AWS
     upload_to_AWS(temp_pdf_path, invoice_file.name)
@@ -40,29 +41,8 @@ def save_line_items(invoice_file):
     temp_jpg_path = temp_pdf_path.replace("pdf", "jpg")
     pdf2jpeg(temp_pdf_path, temp_jpg_path)
 
-    '''
-        This section is to preprocess the image for better extraction of text
-    '''
-    img = cv2.imread(temp_jpg_path)
-
-    # Convert to gray
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Apply dilation and erosion to remove some noise
-    # kernel = numpy.ones((1, 1), numpy.uint8)
-    # img = cv2.dilate(img, kernel, iterations=1)
-    # img = cv2.erode(img, kernel, iterations=1)
-
-    # Apply blur to smooth out the edges
-    # img = cv2.GaussianBlur(img, (5, 5), 0)
-
-    img = cv2.bilateralFilter(img, 9, 75, 75)
-
     # Recognize text with tesseract for python
-    invoice_text = pytesseract.image_to_string(img)
-    # extract text from img
-    # invoice_text = str(
-    #     ((pytesseract.image_to_string(Image.open(save_path)))))
+    invoice_text = preprocess_and_extract(temp_jpg_path)
 
     # delete pdf and img after extraction is complete
     if os.path.isfile(temp_pdf_path):
@@ -74,7 +54,7 @@ def save_line_items(invoice_file):
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
     johnstone_re = re.compile(r'(?i)(JOHNSTONE)')
-    carrier_re = re.compile(r'(?i)(New England)')
+    carrier_re = re.compile(r'(?i)(Distributor Corp.)')
     capco_re = re.compile(r'(?i)(capco)')
     ferguson_re = re.compile(r'(?i)(ferguson)')
 
@@ -153,3 +133,25 @@ def pdf2jpeg(pdf_input_path, jpeg_output_path):
 
     with ghostscript.Ghostscript(*args) as g:
         ghostscript.cleanup()
+
+
+def preprocess_and_extract(temp_jpg_path):
+    '''
+        This section is to preprocess the image for better extraction of text
+    '''
+
+    img = cv2.imread(temp_jpg_path)
+
+    # Convert to gray
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply dilation and erosion to remove some noise
+    kernel = np.ones((1, 1), np.uint8)
+    img = cv2.dilate(img, kernel, iterations=1)
+    img = cv2.erode(img, kernel, iterations=1)
+
+    #  Apply threshold to get image with only black and white
+    img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
+    # Recognize text with tesseract for python
+    return pytesseract.image_to_string(img, lang="eng")

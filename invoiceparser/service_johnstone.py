@@ -6,7 +6,7 @@ def parse_johnstone_invoice(invoice_text):
     date_re = re.compile(r'([0-9][0-9]\/[0-9][0-9]\/[0-9][0-9][0-9][0-9])')
     invoice_number_re = re.compile(r'(\d+\-.+)')
     description_re = re.compile(r'(?i)(Description)')
-    each_re = re.compile(r'(?i)(^.+ea  \d+ea(.*))')
+    each_re = re.compile(r'(?i)(ea)')
     first_half_line_item_re = re.compile(r'(?i)(.+ea  \d+ea(.*))')
     first_half_2_line_item_re = re.compile(r'(?i)(\d+ea  \d+eaj](.*))')
     second_half_line_item_re = re.compile(r'(?i)(?:(?! \d+.\d+\/ea).)*')
@@ -20,13 +20,17 @@ def parse_johnstone_invoice(invoice_text):
     invoice_number = ""
 
     invoice_date_found = False
+    invoice_number_found = False
     lines = invoice_text.split("\n")
     for i in range(len(lines)):
         line = lines[i]
         if date_re.search(line) and invoice_date_found is False:
             invoice_date = date_re.search(line).group(0)
-            invoice_number = invoice_number_re.search(line).group(0)
             invoice_date_found = True
+
+        if invoice_number_re.search(line) and invoice_number_found is False:
+            invoice_number = invoice_number_re.search(line).group(0)
+            invoice_number_found = True
 
         if description_re.search(line):
 
@@ -62,10 +66,11 @@ def parse_johnstone_invoice(invoice_text):
                             price_raw_re, description_line).group(0)
                         current_price = re.search(
                             price_re_without_ea, current_price).group(0)
-                elif description_line.strip() != "":
-                    current_item += " " + description_line
-                    # meta_data.append("Description: " + current_item)
-                    line_items.append((current_item, current_price))
+
+                    line_items.append((description_line, current_price))
+                # elif description_line.strip() != "":
+                #     current_item += " " + description_line
+                # meta_data.append("Description: " + current_item)
 
             break
 
