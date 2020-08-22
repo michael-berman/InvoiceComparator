@@ -59,8 +59,8 @@ def save_line_items(invoice_file):
     if os.path.isfile(temp_pdf_name):
         os.remove(temp_pdf_name)
 
-    if os.path.isfile(temp_jpg_file):
-        os.remove(temp_jpg_file)
+    if os.path.isfile(temp_jpg_name):
+        os.remove(temp_jpg_name)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
