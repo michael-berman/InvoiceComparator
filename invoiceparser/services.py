@@ -32,15 +32,8 @@ def save_line_items(invoice_file):
 
     temp_file_name = 'temp/' + invoice_file.name
 
-    try:
-        ocrmypdf.ocr(temp_file_name, temp_file_name,
-                     force_ocr=True, optimize=0, output_type='pdf', fast_web_view=0, use_threads=True)
-    except Exception as err:
-        print('Handling run-time error:', err)
-
-    # delete temp file since new file has ocr_ prefix
-    # if os.path.isfile(temp_file_name):
-    #     os.remove(temp_file_name)
+    # ocrmypdf.ocr(temp_file_name, temp_file_name,
+    #              force_ocr=True, optimize=0, output_type='pdf', fast_web_view=0)
 
     s3 = boto3.resource('s3', aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
                         aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),)
