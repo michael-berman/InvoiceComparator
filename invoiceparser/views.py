@@ -1,17 +1,10 @@
-import os
-import tempfile
 from decimal import Decimal
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-import boto3
 from decouple import config
-import ocrmypdf
 
 from .models import Supplier, Invoice, InvoiceItem
 from .services import save_line_items, parse_date
@@ -94,14 +87,6 @@ def create(request, supplier_id):
             invoice.save()
 
             file_path = settings.BASE_DIR + '/' + old_invoice_name
-
-            # s3 = boto3.resource('s3')
-            # s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-            #     settings.BASE_DIR + '/' + old_invoice_name, new_invoice_name,
-            #     ExtraArgs={'ACL': 'public-read'})
-
-            if os.path.isfile(file_path):
-                os.remove(file_path)
 
         for i in range(10):
             if 'item' + str(i) in request.POST:

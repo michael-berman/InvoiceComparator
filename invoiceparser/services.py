@@ -1,17 +1,19 @@
 import os
 import re
-import ocrmypdf
-import pdfplumber
 from datetime import datetime
 from django.utils.formats import get_format
-from io import BytesIO
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
 import pytesseract
-import sys
 import ghostscript
 import locale
+import boto3
+from decouple import config
+import cv2
+import numpy
+
+from .models import Supplier
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
@@ -19,48 +21,55 @@ from .service_carrier import parse_carrier_invoice
 from .service_capco import parse_capco_invoice
 from .service_ferguson import parse_ferguson_invoice
 
-from .models import Supplier
-
-import boto3
-from decouple import config
-
 
 def save_line_items(invoice_file):
 
     if not os.path.exists('temp/'):
         os.makedirs('temp/')
 
-        # # save file locally first for aws
+    # save file locally first for aws
     folder = 'temp/'
     fs = FileSystemStorage(location=folder)
     filename = fs.save(invoice_file.name, invoice_file)
+    temp_pdf_path = 'temp/' + invoice_file.name
 
-    temp_pdf_name = 'temp/' + invoice_file.name
+    # Save to AWS
+    upload_to_AWS(temp_pdf_path, invoice_file.name)
 
-    # ocrmypdf.ocr(temp_pdf_name, temp_pdf_name,
-    #              force_ocr=True, optimize=0, output_type='pdf', fast_web_view=0)
+    # convert pdf to img
+    temp_jpg_path = temp_pdf_path.replace("pdf", "jpg")
+    pdf2jpeg(temp_pdf_path, temp_jpg_path)
 
-    s3 = boto3.resource('s3', aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'))
+    '''
+        This section is to preprocess the image for better extraction of text
+    '''
+    img = cv2.imread(temp_jpg_path)
 
-    s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-        temp_pdf_name, "ocr_" + invoice_file.name,
-        ExtraArgs={'ACL': 'public-read'})
+    # Convert to gray
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    temp_jpg_name = temp_pdf_name.replace("pdf", "jpg")
-    # page.save(temp_jpg_name, 'JPEG')
-    pdf2jpeg(temp_pdf_name, temp_jpg_name)
-    invoice_text = str(
-        ((pytesseract.image_to_string(Image.open(temp_jpg_name)))))
+    # Apply dilation and erosion to remove some noise
+    # kernel = numpy.ones((1, 1), numpy.uint8)
+    # img = cv2.dilate(img, kernel, iterations=1)
+    # img = cv2.erode(img, kernel, iterations=1)
 
-    # invoice_text = ''
-    # invoice_text = convert_with_ocr(invoice_file)
+    # Apply blur to smooth out the edges
+    # img = cv2.GaussianBlur(img, (5, 5), 0)
 
-    if os.path.isfile(temp_pdf_name):
-        os.remove(temp_pdf_name)
+    img = cv2.bilateralFilter(img, 9, 75, 75)
 
-    if os.path.isfile(temp_jpg_name):
-        os.remove(temp_jpg_name)
+    # Recognize text with tesseract for python
+    invoice_text = pytesseract.image_to_string(img)
+    # extract text from img
+    # invoice_text = str(
+    #     ((pytesseract.image_to_string(Image.open(save_path)))))
+
+    # delete pdf and img after extraction is complete
+    if os.path.isfile(temp_pdf_path):
+        os.remove(temp_pdf_path)
+
+    if os.path.isfile(temp_jpg_path):
+        os.remove(temp_jpg_path)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
@@ -112,25 +121,6 @@ def save_line_items(invoice_file):
     return meta_data
 
 
-def convert_with_ocr(invoice_file):
-    try:
-        # ocrmypdf.ocr(invoice_file, 'temp/ocr_' + invoice_file_name,
-        #              deskew=True, force_ocr=True)
-        print(invoice_file)
-        temp_file = open('temp/' + invoice_file.name, "r")
-        print(temp_file)
-
-        with pdfplumber.load(temp_file.buffer) as pdf:
-            print("extracting...")
-            page = pdf.pages[0]
-            return page.extract_text()
-    except Exception as err:
-        print('Handling run-time error:', err)
-        with pdfplumber.load('temp/' + invoice_file.name) as pdf:
-            page = pdf.pages[0]
-            return page.extract_text()
-
-
 def parse_date(date_str):
     """Parse date from string by DATE_INPUT_FORMATS of current language"""
     for item in get_format('DATE_INPUT_FORMATS'):
@@ -140,6 +130,14 @@ def parse_date(date_str):
             continue
 
     return None
+
+
+def upload_to_AWS(temp_pdf_path, invoice_file_name):
+    s3 = boto3.resource('s3', aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'))
+    s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
+        temp_pdf_path, invoice_file_name,
+        ExtraArgs={'ACL': 'public-read'})
 
 
 def pdf2jpeg(pdf_input_path, jpeg_output_path):
