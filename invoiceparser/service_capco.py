@@ -23,7 +23,7 @@ def parse_capco_invoice(invoice_text):
     for i in range(len(lines)):
         line = lines[i]
 
-        if date_re.match(line) and invoice_date_found is False:
+        if date_re.search(line) and invoice_date_found is False:
             invoice_date = date_re.search(line).group(0)
 
             # OCR is reading S as $
