@@ -8,8 +8,8 @@ def parse_ferguson_invoice(invoice_text):
     description_re = re.compile(r'(?i)(description)')
     each_re = re.compile(r'(?i)(ea)')
     price_re = re.compile(r'(?i)(\d{0,4}\.\d{3})')
-    first_half_line_item_re = re.compile(r'(\d+  \d+ . )(.*)')
-    second_half_line_item_re = re.compile(r'(?:(?! \d+\.\d+).)*')
+    first_half_line_item_re = re.compile(r'(?i)(.+?(?=\d{1,3}\.\d{1,3}))')
+    second_half_line_item_re = re.compile(r'\| (.*)')
     line_item_re = re.compile(r'((?:(?!(\d+  \d{1,4}\.\d{3})).)*)')
     final_line_re = re.compile(r'(?i)(sub-total)')
 
@@ -54,9 +54,9 @@ def parse_ferguson_invoice(invoice_text):
                         line_items.append((current_item, current_price))
 
                     current_item = first_half_line_item_re.search(
-                        description_line).group(2)
+                        description_line).group(0)
                     current_item = second_half_line_item_re.search(
-                        current_item).group(0)
+                        current_item).group(1)
 
                     if price_re.search(description_line):
                         current_price = price_re.search(
