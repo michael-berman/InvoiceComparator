@@ -9,8 +9,8 @@ def parse_carrier_invoice(invoice_text):
     description_re = re.compile(r'^ DESCRIPTION')
     each_re = re.compile(r'(?i)(each)')
     price_re = re.compile(r'(?i)(\d+\.[0-9][0-9])')
-    first_half_line_item_re = re.compile(r'(?<=\d. ).*')
-    second_half_line_item_re = re.compile(r'(?:(?!\d ).)*')
+    first_half_line_item_re = re.compile(r'.+?(?= \d+ )')
+    second_half_line_item_re = re.compile(r'\d+ (.*)')
     # line_item_re = re.compile(r'(\b\d \s+\K\S+)')
     final_line_re = re.compile(r'(?i)(Lines)')
 
@@ -53,14 +53,12 @@ def parse_carrier_invoice(invoice_text):
                 if each_re.search(description_line):
                     if current_item:
                         line_items.append((current_item, current_price))
+                        break
 
                     current_item = first_half_line_item_re.search(
                         description_line).group(0)
                     current_item = second_half_line_item_re.search(
-                        current_item).group(0)
-
-                    #  re.search(
-                    #     line_item_re, description_line).group(0)
+                        current_item).group(1)
 
                     if price_re.search(description_line):
                         current_price = re.search(

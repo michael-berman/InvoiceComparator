@@ -65,7 +65,7 @@ def save_line_items(invoice_file):
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
     johnstone_re = re.compile(r'(?i)(JOHNSTONE)')
-    carrier_re = re.compile(r'(?i)(Distributor Corporation of New England)')
+    carrier_re = re.compile(r'(?i)(New England)')
     capco_re = re.compile(r'(?i)(capco)')
     ferguson_re = re.compile(r'(?i)(ferguson)')
 
@@ -75,23 +75,23 @@ def save_line_items(invoice_file):
         line = lines[i]
         supplier = ""
 
-        if delta_re.match(line):
+        if delta_re.search(line):
             meta_data = parse_delta_invoice(invoice_text)
             supplier = "delta"
 
-        if johnstone_re.match(line):
+        if johnstone_re.search(line):
             meta_data = parse_johnstone_invoice(invoice_text)
             supplier = "johnstone"
 
-        if carrier_re.match(line):
+        if carrier_re.search(line):
             meta_data = parse_carrier_invoice(invoice_text)
             supplier = "carrier"
 
-        if capco_re.match(line):
+        if capco_re.search(line):
             meta_data = parse_capco_invoice(invoice_text)
             supplier = "capco"
 
-        if ferguson_re.match(line):
+        if ferguson_re.search(line):
             meta_data = parse_ferguson_invoice(invoice_text)
             supplier = "ferguson"
 
