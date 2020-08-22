@@ -6,8 +6,8 @@ def parse_delta_invoice(invoice_text):
     date_re = re.compile(r'([0-9][0-9]/[0-9][0-9]/[0-9][0-9])')
     description_re = re.compile(r'^ DESCRIPTION')
     each_re = re.compile(r'(?i)(\d+EA)')
-    price_re = re.compile(r'(?i)([0-9]{1,3}\.[0-9][0-9][0-9])')
-    line_item_re = re.compile(r'(?:(?!\dEA).)*')
+    price_re = re.compile(r'(?i)([0-9]{1,3}\.[0-9][0-9][0-9])ea')
+    line_item_re = re.compile(r'(?:(?! .EA).)*')
     final_line_re = re.compile(r'(?i)(Thank)')
 
     meta_data = {}
@@ -27,12 +27,12 @@ def parse_delta_invoice(invoice_text):
             invoice_number = invoice_number.replace("$", "S")
             invoice_date_found = True
 
-        if description_re.match(line):
+        if price_re.search(line):
 
             # start scanning for description lines
             current_item = ""
             current_price = ""
-            for j in range(i + 1, len(lines)):
+            for j in range(i, len(lines)):
                 description_line = lines[j]
 
                 if final_line_re.search(description_line):
@@ -44,7 +44,7 @@ def parse_delta_invoice(invoice_text):
 
                     if price_re.search(description_line):
                         current_price = re.search(
-                            price_re, description_line).group(0)
+                            price_re, description_line).group(0).replace('ea', '')
                 elif description_line.strip() != "":
                     current_item += " " + description_line
                     # meta_data.append("Description: " + current_item)
