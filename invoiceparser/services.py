@@ -7,6 +7,11 @@ from django.utils.formats import get_format
 from io import BytesIO
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from PIL import Image
+import pytesseract
+import sys
+import ghostscript
+import locale
 
 from .service_delta import parse_delta_invoice
 from .service_johnstone import parse_johnstone_invoice
@@ -30,22 +35,32 @@ def save_line_items(invoice_file):
     fs = FileSystemStorage(location=folder)
     filename = fs.save(invoice_file.name, invoice_file)
 
-    temp_file_name = 'temp/' + invoice_file.name
+    temp_pdf_name = 'temp/' + invoice_file.name
 
-    # ocrmypdf.ocr(temp_file_name, temp_file_name,
+    # ocrmypdf.ocr(temp_pdf_name, temp_pdf_name,
     #              force_ocr=True, optimize=0, output_type='pdf', fast_web_view=0)
 
     s3 = boto3.resource('s3', aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
-                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'),)
+                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'))
+
     s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
-        temp_file_name, "ocr_" + invoice_file.name,
+        temp_pdf_name, "ocr_" + invoice_file.name,
         ExtraArgs={'ACL': 'public-read'})
 
-    invoice_text = ''
-    invoice_text = convert_with_ocr(invoice_file)
+    temp_jpg_name = temp_pdf_name.replace("pdf", "jpg")
+    # page.save(temp_jpg_name, 'JPEG')
+    pdf2jpeg(temp_pdf_name, temp_jpg_name)
+    invoice_text = str(
+        ((pytesseract.image_to_string(Image.open(temp_jpg_name)))))
 
-    if os.path.isfile(temp_file_name):
-        os.remove(temp_file_name)
+    # invoice_text = ''
+    # invoice_text = convert_with_ocr(invoice_file)
+
+    if os.path.isfile(temp_pdf_name):
+        os.remove(temp_pdf_name)
+
+    if os.path.isfile(temp_jpg_file):
+        os.remove(temp_jpg_file)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
@@ -125,3 +140,18 @@ def parse_date(date_str):
             continue
 
     return None
+
+
+def pdf2jpeg(pdf_input_path, jpeg_output_path):
+    args = ["pef2jpeg",  # actual value doesn't matter
+            "-dNOPAUSE",
+            "-sDEVICE=jpeg",
+            "-r144",
+            "-sOutputFile=" + jpeg_output_path,
+            pdf_input_path]
+
+    encoding = locale.getpreferredencoding()
+    args = [a.encode(encoding) for a in args]
+
+    with ghostscript.Ghostscript(*args) as g:
+        ghostscript.cleanup()
