@@ -74,8 +74,8 @@ def save_line_items(invoice_file):
     #     invoice_text = page.extract_text()
 
     # delete pdf and img after extraction is complete
-    if os.path.isfile(temp_pdf_path):
-        os.remove(temp_pdf_path)
+    # if os.path.isfile(temp_pdf_path):
+    #     os.remove(temp_pdf_path)
 
     # if os.path.isfile(temp_jpg_path):
     #     os.remove(temp_jpg_path)
