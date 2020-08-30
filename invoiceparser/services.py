@@ -49,24 +49,24 @@ def save_line_items(invoice_file):
     # invoice_text = preprocess_and_extract(temp_jpg_path)
 
     invoice_text = ''
-    # try:
-    #     ocrmypdf.ocr(temp_pdf_path, temp_pdf_path,
-    #                  deskew=True, force_ocr=True)
-    #     temp_file = open(temp_pdf_path, "r")
-    #     with pdfplumber.load(temp_file.buffer) as pdf:
-    #         page = pdf.pages[0]
-    #         invoice_text = page.extract_text()
-    # except Exception as err:
-    #     print(err)
-    #     with pdfplumber.load(invoice_file.file) as pdf:
-    #         page = pdf.pages[0]
-    #         invoice_text = page.extract_text()
+    try:
+        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path,
+                     deskew=True, force_ocr=True)
+        temp_file = open(temp_pdf_path, "r")
+        with pdfplumber.load(temp_file.buffer) as pdf:
+            page = pdf.pages[0]
+            invoice_text = page.extract_text()
+    except Exception as err:
+        print(err)
+        with pdfplumber.load(invoice_file.file) as pdf:
+            page = pdf.pages[0]
+            invoice_text = page.extract_text()
 
-    process_args = ['ocrmypdf', temp_pdf_path, temp_pdf_path,
-                    '--deskew', '--force-ocr']
+    # process_args = ['ocrmypdf', temp_pdf_path, temp_pdf_path,
+    #                 '--deskew', '--force-ocr']
 
-    process = Popen(process_args)
-    process.wait()
+    # process = Popen(process_args)
+    # process.wait()
     # out = check_output(process_args)
 
     temp_file = open(temp_pdf_path, "r")
