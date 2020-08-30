@@ -12,6 +12,7 @@ from .services import save_line_items, parse_date
 
 from rq import Queue
 from InvoiceComparer.worker import conn
+import os
 
 redis_queue = Queue(connection=conn)
 
@@ -162,3 +163,8 @@ def search_invoice_items(request, supplier_id, search):
     invoice_items = InvoiceItem.objects.filter(supplier=supplier).order_by(
         'description').values("id", "description", "price")
     return JsonResponse({"invoice_items": list(invoice_items)}, status=200)
+
+
+def check_process(request, pid):
+    process = os.getpgid(pid)
+    print(process)

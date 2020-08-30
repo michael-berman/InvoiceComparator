@@ -18,4 +18,5 @@ urlpatterns = [
          views.load_invoice_items, name="load_invoice_items"),
     path('ajax/invoices/<int:supplier_id>/',
          views.load_invoices, name="load_invoices"),
+    path('ajax/process/<int:pid>/', views.check_process, name="check_process")
 ]
