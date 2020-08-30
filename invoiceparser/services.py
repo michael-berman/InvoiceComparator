@@ -14,6 +14,10 @@ from decouple import config
 import cv2
 import numpy as np
 
+import ocrmypdf
+import pdfplumber
+from subprocess import Popen
+
 from .models import Supplier
 
 from .service_delta import parse_delta_invoice
@@ -38,18 +42,32 @@ def save_line_items(invoice_file):
     upload_to_AWS(temp_pdf_path, invoice_file.name)
 
     # convert pdf to img
-    temp_jpg_path = temp_pdf_path.replace("pdf", "jpg")
-    pdf2jpeg(temp_pdf_path, temp_jpg_path)
+    # temp_jpg_path = temp_pdf_path.replace("pdf", "jpg")
+    # pdf2jpeg(temp_pdf_path, temp_jpg_path)
 
     # Recognize text with tesseract for python
-    invoice_text = preprocess_and_extract(temp_jpg_path)
+    # invoice_text = preprocess_and_extract(temp_jpg_path)
+
+    invoice_text = ''
+    try:
+        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path,
+                     deskew=True, force_ocr=True)
+        temp_file = open(temp_pdf_path, "r")
+        with pdfplumber.load(temp_file.buffer) as pdf:
+            page = pdf.pages[0]
+            invoice_text = page.extract_text()
+    except Exception as err:
+        print(err)
+        with pdfplumber.load(invoice_file.file) as pdf:
+            page = pdf.pages[0]
+            invoice_text = page.extract_text()
 
     # delete pdf and img after extraction is complete
     if os.path.isfile(temp_pdf_path):
         os.remove(temp_pdf_path)
 
-    if os.path.isfile(temp_jpg_path):
-        os.remove(temp_jpg_path)
+    # if os.path.isfile(temp_jpg_path):
+    #     os.remove(temp_jpg_path)
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')

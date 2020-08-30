@@ -44,7 +44,7 @@ def parse_delta_invoice(invoice_text):
 
                     if price_re.search(description_line):
                         current_price = re.search(
-                            price_re, description_line).group(0).replace('ea', '')
+                            price_re, description_line).group(0).replace('ea', '').replace('EA', '')
                 elif description_line.strip() != "":
                     current_item += " " + description_line
                     # meta_data.append("Description: " + current_item)
