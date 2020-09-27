@@ -5,8 +5,8 @@
 <h3 class='mb-3'>Compare</h3>
 <div class="container-fluid">
   <div class="row">
-    <div class="row col">
-      <div class="dropdown mb-3 col-md-3 first">
+    <div class="col-md-6">
+      <div class=" dropdown mb-3 first">
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
           Select Supplier
@@ -27,7 +27,7 @@
           aria-describedby="inputGroup-sizing-default">
       </div>
     </div>
-    <div class="row col">
+    <div class="col-md-6">
       <div class="dropdown mb-3 col-md-3 second">
         <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton2" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
@@ -52,29 +52,30 @@
   </div>
 </div>
 
+<div class="container-fluid">
+  <div class="row">
 
-<div class="row">
-
-  <table class="table table-striped table-bordered col" id="firstTable">
-    <thead>
-      <tr>
-        <th scope="col">Description</th>
-        <th scope="col">Price</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-  <table class="table table-striped table-bordered col" id="secondTable">
-    <thead>
-      <tr>
-        <th scope="col">Description</th>
-        <th scope="col">Price</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
+    <table class="table table-striped table-bordered col-6" id="firstTable">
+      <thead>
+        <tr>
+          <th scope="col">Description</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <table class="table table-striped table-bordered col-6" id="secondTable">
+      <thead>
+        <tr>
+          <th scope="col">Description</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 {% comment %} <table class="table table-striped table-bordered" id="secondTable">
