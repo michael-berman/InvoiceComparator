@@ -129,8 +129,8 @@ def upload_file(request):
     supplier_list = Supplier.objects.order_by('id')
     context = {
         'supplier_list': list(supplier_list),
-        'extracted_text': {},
-        'process_id': meta_data.id,
+        'extracted_text': meta_data,
+        'process_id': None,  # meta_data.id,
         'file_name': invoice_file.name,
     }
 
