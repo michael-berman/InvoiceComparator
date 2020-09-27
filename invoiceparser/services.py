@@ -51,7 +51,7 @@ def save_line_items(invoice_file):
 
     invoice_text = ''
     try:
-        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path, force_ocr=True)
+        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path)
         temp_file = open(temp_pdf_path, "r")
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
@@ -67,6 +67,11 @@ def save_line_items(invoice_file):
 
     # process = Popen(process_args)
     # out = check_output(process_args)
+
+    print("-----------------------")
+    print("FileName:")
+    print(filename)
+    print("-----------------------")
 
     # delete pdf and img after extraction is complete
     if os.path.isfile(temp_pdf_path):
