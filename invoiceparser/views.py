@@ -122,9 +122,9 @@ def upload_file(request):
     if request.method == 'POST':
         invoice_file = request.FILES.get('invoice')
         if request.FILES['invoice']:
-            # meta_data = redis_queue.enqueue(
-            #     save_line_items, invoice_file)
-            meta_data = save_line_items(invoice_file)
+            meta_data = redis_queue.enqueue(
+                save_line_items, invoice_file)
+            # meta_data = save_line_items(invoice_file)
 
     supplier_list = Supplier.objects.order_by('id')
     context = {
