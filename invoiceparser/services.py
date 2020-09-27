@@ -51,8 +51,7 @@ def save_line_items(invoice_file):
 
     invoice_text = ''
     try:
-        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path,
-                     output_type="pdf", fast_web_view=0, optimize=0, skip_big=0)
+        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path, force_ocr=True)
         temp_file = open(temp_pdf_path, "r")
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
