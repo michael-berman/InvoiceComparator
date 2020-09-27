@@ -50,7 +50,7 @@ def save_line_items(invoice_file):
             page = pdf.pages[0]
             invoice_text = page.extract_text()
     except Exception as err:
-        print("t" + err)
+        print("Add error catch from here. " + err)
         with pdfplumber.load(temp_pdf_path) as pdf:
             page = pdf.pages[0]
             invoice_text = page.extract_text()
