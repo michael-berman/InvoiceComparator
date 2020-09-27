@@ -38,6 +38,14 @@ def save_line_items(invoice_file):
     filename = fs.save(invoice_file.name, invoice_file)
     temp_pdf_path = 'temp/' + filename
 
+    print("-----------------------")
+    print("FILE: ")
+    print(fs)
+    print("-----------------------")
+    print("FileName:")
+    print(filename)
+    print("-----------------------")
+
     # Save to AWS
     upload_to_AWS(temp_pdf_path, invoice_file.name)
 
