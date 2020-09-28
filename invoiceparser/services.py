@@ -55,8 +55,7 @@ def save_line_items(invoice_file):
 
     invoice_text = ''
     try:
-        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path,
-                     redo_ocr=True, force_ocr=True)
+        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path, force_ocr=True)
         print("-----------------------")
         print("File has been ocr'd")
         print("-----------------------")
