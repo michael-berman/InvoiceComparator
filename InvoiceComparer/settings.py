@@ -123,7 +123,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = config('STATIC_ROOT')
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # AWS Config
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
