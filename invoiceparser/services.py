@@ -29,15 +29,14 @@ from .service_ferguson import parse_ferguson_invoice
 
 def save_line_items(invoice_file):
 
-    folder = settings.STATIC_URL + 'temp/'
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    if not os.path.exists('temp/'):
+        os.makedirs('temp/')
 
     # save file locally first for aws
-    # folder = 'temp/'
+    folder = 'temp/'
     fs = FileSystemStorage(location=folder)
     filename = fs.save(invoice_file.name, invoice_file)
-    temp_pdf_path = folder + filename
+    temp_pdf_path = 'temp/' + filename
 
     print("-----------------------")
     print("FILE: ")
