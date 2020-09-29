@@ -29,7 +29,7 @@ from .service_ferguson import parse_ferguson_invoice
 
 def save_line_items(invoice_file):
 
-    folder = '/temp'
+    folder = settings.UPLOAD_PATH
     if not os.path.exists(folder):
         os.makedirs(folder)
 
