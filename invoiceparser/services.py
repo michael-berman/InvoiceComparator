@@ -61,7 +61,7 @@ def save_line_items(invoice_file):
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
     johnstone_re = re.compile(r'(?i)(JOHNSTONE)')
-    carrier_re = re.compile(r'(?i)(Distributor Corp.)')
+    carrier_re = re.compile(r'(?i)(Distributor)')
     capco_re = re.compile(r'(?i)(capco)')
     ferguson_re = re.compile(r'(?i)(ferguson)')
 
