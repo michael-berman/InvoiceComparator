@@ -12,4 +12,4 @@ Application to parse invoices and compare different items bought from suppliers
 * Upload items with manual form
 * Comparison table
 * AWS storage for invoices
-* Deployed to Heroku with CDCI
+* Deployed to EC2 Ubuntu 18.04 instance
