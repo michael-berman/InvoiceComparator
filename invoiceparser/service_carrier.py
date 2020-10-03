@@ -53,7 +53,6 @@ def parse_carrier_invoice(invoice_text):
                 if each_re.search(description_line):
                     if current_item:
                         line_items.append((current_item, current_price))
-                        break
 
                     current_item = first_half_line_item_re.search(
                         description_line).group(0)
