@@ -6,7 +6,7 @@ def parse_delta_invoice(invoice_text):
     date_re = re.compile(r'([0-9][0-9]/[0-9][0-9]/[0-9][0-9])')
     description_re = re.compile(r'^ DESCRIPTION')
     each_re = re.compile(r'(?i)(\d+EA)')
-    price_re = re.compile(r'(?i)([0-9]{1,3}\.[0-9][0-9][0-9])ea')
+    price_re = re.compile(r'(?i)(\s[0-9]{1,3}\s?\.[0-9]{2,3})..')
     line_item_re = re.compile(r'(?:(?! .EA).)*')
     final_line_re = re.compile(r'(?i)(Thank)')
 
@@ -36,9 +36,15 @@ def parse_delta_invoice(invoice_text):
                 description_line = lines[j]
 
                 if final_line_re.search(description_line):
+                    if current_item:
+                        line_items.append((current_item, current_price))
                     break
 
                 if each_re.search(description_line):
+
+                    if current_item:
+                        line_items.append((current_item, current_price))
+
                     current_item = re.search(
                         line_item_re, description_line).group(0).strip()
 
@@ -48,7 +54,7 @@ def parse_delta_invoice(invoice_text):
                 elif description_line.strip() != "":
                     current_item += " " + description_line
                     # meta_data.append("Description: " + current_item)
-                    line_items.append((current_item, current_price))
+                    # line_items.append((current_item, current_price))
 
             break
 
