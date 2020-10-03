@@ -39,36 +39,14 @@ def save_line_items(invoice_file):
     filename = fs.save(invoice_file.name, invoice_file)
     temp_pdf_path = folder + filename
 
-    print("-----------------------")
-    print("FILE: ")
-    print(fs)
-    print("-----------------------")
-    print("FileName:")
-    print(filename)
-    print("-----------------------")
-
-    print("-----------------------")
-    print("File uploaded to AWS")
-    print("-----------------------")
-
     invoice_text = ''
     try:
         ocrmypdf.ocr(temp_pdf_path, temp_pdf_path, force_ocr=True)
-        print("-----------------------")
-        print("File has been ocr'd")
-        print("-----------------------")
         temp_file = open(temp_pdf_path, "r")
-        print("-----------------------")
-        print("File has been opened.")
-        print("-----------------------")
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
             invoice_text = page.extract_text()
-        print("-----------------------")
-        print("Text has been extracted.")
-        print("-----------------------")
     except Exception as err:
-        print("Add error catch from here. " + err)
         with pdfplumber.load(temp_pdf_path) as pdf:
             page = pdf.pages[0]
             invoice_text = page.extract_text()
@@ -79,10 +57,6 @@ def save_line_items(invoice_file):
     # delete pdf and img after extraction is complete
     if os.path.isfile(temp_pdf_path):
         os.remove(temp_pdf_path)
-
-    print("-----------------------")
-    print("File has been deleted.")
-    print("-----------------------")
 
     # Regular expressions
     delta_re = re.compile(r'(?i)DELTA')
