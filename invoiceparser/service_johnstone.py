@@ -46,8 +46,8 @@ def parse_johnstone_invoice(invoice_text):
 
                 if each_re.search(description_line):
                     # for one liners
-                    # if current_item and current_price:
-                    #     line_items.append((current_item, current_price))
+                    if current_item and current_price:
+                        line_items.append((current_item, current_price))
 
                     # check first with eaj
                     if first_half_line_item_re.search(description_line):
@@ -67,9 +67,9 @@ def parse_johnstone_invoice(invoice_text):
                         current_price = re.search(
                             price_re_without_ea, current_price).group(0)
 
-                    line_items.append((description_line, current_price))
-                # elif description_line.strip() != "":
-                #     current_item += " " + description_line
+                    # line_items.append((description_line, current_price))
+                elif description_line.strip() != "":
+                    current_item += " " + description_line
                 # meta_data.append("Description: " + current_item)
 
             break
