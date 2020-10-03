@@ -53,9 +53,10 @@ def parse_ferguson_invoice(invoice_text):
                     if current_item:
                         line_items.append((current_item, current_price))
 
-                    current_item = first_half_line_item_re.search(
-                        description_line).group(0)
                     try:
+                        current_item = first_half_line_item_re.search(
+                            description_line).group(0)
+
                         current_item = second_half_line_item_re.search(
                             current_item).group(1)
                     except Exception:
