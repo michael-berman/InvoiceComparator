@@ -10,7 +10,9 @@ def parse_capco_invoice(invoice_text):
     each_re = re.compile(r'\dEA')
     price_re = re.compile(r'(?i)( \d{0,4}\.\d{3})')
     line_item_re = re.compile(r'((?:(?!(\d+  \d{1,4}\.\d{3})).)*)')
-    final_line_re = re.compile(r'(?i)(note)')
+    note_final_line_re = re.compile(r'(?i)(note)')
+    subtotal_final_line_re = re.compile(r'(?i)(subtotal)')
+    asterisk_final_line_re = re.compile(r'^\*+')
 
     meta_data = {}
     line_items = []
@@ -45,7 +47,7 @@ def parse_capco_invoice(invoice_text):
             for j in range(i, len(lines)):
                 description_line = lines[j]
 
-                if final_line_re.search(description_line):
+                if note_final_line_re.search(description_line) or subtotal_final_line_re.search(description_line):
                     if current_item:
                         line_items.append((current_item, current_price))
                     break

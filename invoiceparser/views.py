@@ -89,7 +89,7 @@ def create(request, supplier_id):
 
             file_path = settings.BASE_DIR + '/' + old_invoice_name
 
-        for i in range(10):
+        for i in range(20):
             if 'item' + str(i) in request.POST:
                 item = request.POST['item' + str(i)]
                 price = request.POST['price' + str(i)]
