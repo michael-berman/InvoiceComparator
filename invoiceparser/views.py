@@ -10,11 +10,7 @@ from .models import Supplier, Invoice, InvoiceItem
 from .services import save_line_items, parse_date, rename_file_AWS
 
 
-from rq import Queue
-from InvoiceComparer.worker import conn
 import os
-
-redis_queue = Queue(connection=conn)
 
 
 def index(request):
@@ -126,8 +122,6 @@ def upload_file(request):
     if request.method == 'POST':
         invoice_file = request.FILES.get('invoice')
         if request.FILES['invoice']:
-            # meta_data = redis_queue.enqueue(
-            #     save_line_items, invoice_file)
             meta_data = save_line_items(invoice_file)
 
     supplier_list = Supplier.objects.order_by('id')
