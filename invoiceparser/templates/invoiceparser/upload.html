@@ -16,6 +16,8 @@
 </form>
 
 {% if extracted_text %}
+<br />
+<button class="btn btn-info" id="parsed-add-line-button" type="button">Add Line</button>
 <form action="{% url 'invoiceparser:create' extracted_text.supplier_id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="text" name="old_invoice_name" value="{{ file_name }}" style="display:none;"
@@ -39,7 +41,7 @@
 
     <h4>Invoice Items</h4>
     {% for item_key, item, price_key, price in extracted_text.line_items %}
-    <div class="input-group mb-3">
+    <div class="input-group mb-3 parsed-item">
         <div class="input-group-prepend">
             <span class="input-group-text" id="">Invoice Description and Price</span>
         </div>
@@ -50,19 +52,8 @@
         </div>
     </div>
     {% endfor %}
+    <div id="new-line-items"></div>
     <input class="btn btn-primary" type="submit" value="Save" class="button">
 </form>
 {% endif %}
 {% endblock content %}
-
-{% comment %} {% block javascript %}
-
-<script>
-    $('#invoiceFileInput').on('change', function () {
-        //get the file name
-        var fileName = $(this).val();
-        //replace the "Choose a file" label
-        $(this).next('.custom-file-label').html(fileName);
-    })
-</script>
-{% endblock javascript %} {% endcomment %}
