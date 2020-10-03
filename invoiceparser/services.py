@@ -73,29 +73,32 @@ def save_line_items(invoice_file):
 
         if delta_re.search(line):
             meta_data = parse_delta_invoice(invoice_text)
-            supplier = "delta"
+            supplier = "Delta"
 
         if johnstone_re.search(line):
             meta_data = parse_johnstone_invoice(invoice_text)
-            supplier = "johnstone"
+            supplier = "Johnstone"
 
         if carrier_re.search(line):
             meta_data = parse_carrier_invoice(invoice_text)
-            supplier = "carrier"
+            supplier = "Carrier"
 
         if capco_re.search(line):
             meta_data = parse_capco_invoice(invoice_text)
-            supplier = "capco"
+            supplier = "Capco"
 
         if ferguson_re.search(line):
             meta_data = parse_ferguson_invoice(invoice_text)
-            supplier = "ferguson"
+            supplier = "Ferguson"
 
         if supplier:
             meta_data["supplier_id"] = Supplier.objects.filter(
                 supplier_name__icontains=supplier)[0].id
             meta_data["invoice_date"] = meta_data["invoice_date"].strip()
             meta_data["invoice_number"] = meta_data["invoice_number"].strip()
+            meta_data["new_invoice_name"] = supplier + " " + \
+                meta_data["invoice_date"].replace(
+                    "/", "-") + " " + meta_data["invoice_number"] + ".pdf"
             # create item and price keys
             for i in range(len(meta_data['line_items'])):
                 item, price = meta_data['line_items'][i]
