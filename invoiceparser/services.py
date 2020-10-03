@@ -47,9 +47,6 @@ def save_line_items(invoice_file):
     print(filename)
     print("-----------------------")
 
-    # Save to AWS
-    upload_to_AWS(temp_pdf_path, invoice_file.name)
-
     print("-----------------------")
     print("File uploaded to AWS")
     print("-----------------------")
@@ -76,11 +73,8 @@ def save_line_items(invoice_file):
             page = pdf.pages[0]
             invoice_text = page.extract_text()
 
-    # process_args = ['ocrmypdf', temp_pdf_path, temp_pdf_path,
-    #                 '--force-ocr']
-
-    # process = Popen(process_args)
-    # out = check_output(process_args)
+    # Save to AWS
+    upload_to_AWS(temp_pdf_path, invoice_file.name)
 
     # delete pdf and img after extraction is complete
     if os.path.isfile(temp_pdf_path):
@@ -157,6 +151,18 @@ def upload_to_AWS(temp_pdf_path, invoice_file_name):
     s3.Bucket(config('AWS_STORAGE_BUCKET_NAME')).upload_file(
         temp_pdf_path, invoice_file_name,
         ExtraArgs={'ACL': 'public-read'})
+
+
+def rename_file_AWS(old_name, new_name):
+    s3 = boto3.resource('s3', aws_access_key_id=config('AWS_ACCESS_KEY_ID'),
+                        aws_secret_access_key=config('AWS_SECRET_ACCESS_KEY'))
+    copy_source = {
+        'Bucket': config('AWS_STORAGE_BUCKET_NAME'),
+        'Key': old_name
+    }
+    bucket = s3.Bucket(config('AWS_STORAGE_BUCKET_NAME'))
+    bucket.copy(copy_source, new_name)
+    s3.Object(config('AWS_STORAGE_BUCKET_NAME'), old_name).delete()
 
 
 def pdf2jpeg(pdf_input_path, jpeg_output_path):

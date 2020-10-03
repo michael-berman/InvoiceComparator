@@ -7,7 +7,7 @@ from django.conf import settings
 from decouple import config
 
 from .models import Supplier, Invoice, InvoiceItem
-from .services import save_line_items, parse_date
+from .services import save_line_items, parse_date, rename_file_AWS
 
 
 from rq import Queue
@@ -79,6 +79,10 @@ def create(request, supplier_id):
         if 'items-only' not in request.POST:
             old_invoice_name = request.POST['old_invoice_name']
             new_invoice_name = request.POST['new_invoice_name']
+
+            # rename invoice file if different
+            if old_invoice_name != new_invoice_name:
+                rename_file_AWS(old_invoice_name, new_invoice_name)
 
             invoice = Invoice(supplier=supplier,
                               invoice_number=request.POST['invoice_number'],
