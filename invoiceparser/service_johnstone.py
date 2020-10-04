@@ -9,7 +9,9 @@ def parse_johnstone_invoice(invoice_text):
     each_re = re.compile(r'(?i)(ea)')
     first_half_line_item_re = re.compile(r'(?i)(.+ea  \d+ea(.*))')
     first_half_2_line_item_re = re.compile(r'(?i)(\d+ea  \d+eaj](.*))')
+    first_half_3_line_item_re = re.compile(r'(?i)^(.*?)(\d+.\d+\/ea)')
     second_half_line_item_re = re.compile(r'(?i)(?:(?! \d+.\d+\/ea).)*')
+    second_half_2_line_item_re = re.compile(r'(?i)\|(.*)')
     price_raw_re = re.compile(r'(?i)\d+.\d+\/ea')
     price_re_without_ea = re.compile(r'(?i)(?:(?!\/ea).)*')
     subtotal_re = re.compile(r'(?i)(Subtotal)')
@@ -61,6 +63,11 @@ def parse_johnstone_invoice(invoice_text):
                             description_line).group(2)
                         current_item = second_half_line_item_re.search(
                             current_item).group(0).strip()
+                    elif first_half_3_line_item_re.search(description_line):
+                        current_item = first_half_3_line_item_re.search(
+                            description_line).group(1)
+                        current_item = second_half_2_line_item_re.search(
+                            current_item).group(1).strip()
 
                     if price_raw_re.search(description_line):
                         current_price = re.search(
