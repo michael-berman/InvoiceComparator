@@ -41,13 +41,14 @@ def parse_johnstone_invoice(invoice_text):
                 description_line = lines[j]
 
                 if subtotal_re.search(description_line):
-                    line_items.append((current_item, current_price))
+                    # johnstone has a line before the description from OCR
+                    line_items.append((current_item[1:], current_price))
                     break
 
                 if each_re.search(description_line):
                     # for one liners
                     if current_item and current_price:
-                        line_items.append((current_item, current_price))
+                        line_items.append((current_item[1:], current_price))
 
                     # check first with eaj
                     if first_half_line_item_re.search(description_line):
