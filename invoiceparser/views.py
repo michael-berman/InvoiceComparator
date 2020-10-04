@@ -122,7 +122,8 @@ def upload_file(request):
     if request.method == 'POST':
         invoice_file = request.FILES.get('invoice')
         if request.FILES['invoice']:
-            meta_data = save_line_items(invoice_file)
+            forceOcr = "forceOcr" in request.POST
+            meta_data = save_line_items(invoice_file, forceOcr)
 
     supplier_list = Supplier.objects.order_by('id')
     context = {

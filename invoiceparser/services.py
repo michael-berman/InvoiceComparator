@@ -27,7 +27,7 @@ from .service_capco import parse_capco_invoice
 from .service_ferguson import parse_ferguson_invoice
 
 
-def save_line_items(invoice_file):
+def save_line_items(invoice_file, forceOcr):
 
     folder = settings.UPLOAD_PATH
     if not os.path.exists(folder):
@@ -41,7 +41,7 @@ def save_line_items(invoice_file):
 
     invoice_text = ''
     try:
-        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path, force_ocr=True)
+        ocrmypdf.ocr(temp_pdf_path, temp_pdf_path, force_ocr=forceOcr)
         temp_file = open(temp_pdf_path, "r")
         with pdfplumber.load(temp_file.buffer) as pdf:
             page = pdf.pages[0]
