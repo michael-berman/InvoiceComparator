@@ -36,7 +36,7 @@ pdf2image==1.13.1
 pdfminer.six==20200104
 pdfplumber==0.5.22
 pi==0.1.2
-pikepdf==1.17.2
+pikepdf==2.10.0
 Pillow==7.1.2
 pipdeptree==2.0.0b1
 pluggy==0.13.1
