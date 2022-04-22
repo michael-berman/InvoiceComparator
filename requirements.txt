@@ -46,7 +46,7 @@ pycodestyle==2.6.0
 pycparser==2.20
 pycryptodome==3.9.8
 pylint==2.5.3
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pytesseract==0.3.5
 python-dateutil==2.8.1
 python-decouple==3.3
